@@ -1,0 +1,43 @@
+﻿@page "/addskill"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.SkillService
+@inject ISkillService SkillService;
+
+<PageTitle>New Skill</PageTitle>
+
+<h3>New Skill</h3>
+<!--
+<MudAutocomplete T="string" Label="Choose a skill" ResetValueOnEmptyText="true" @bind-Value="Skill.Name" />
+-->
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
+            <div class="mb-3">
+                <label for="name" class="form-label">Skillname:</label>
+                <InputText id="name" @bind-Value="Skill.Name" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Skill</button>
+        </EditForm>
+    </div>
+</div>
+
+@code 
+{
+    private Skill Skill { get; set; } = new Skill();
+    //private string skill;
+
+    private async Task HandleValidSubmit()
+    {
+        //if (skill is null) return;
+        //await SkillService.Add(Skill);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+    }
+
+}

@@ -1,0 +1,79 @@
+﻿@page "/myskills"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.SkillService
+@using System.Threading;
+@inject ISkillService SkillService;
+
+<PageTitle>My Skills</PageTitle>
+
+<h3>New Skill</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@selectedSkill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
+            <MudAutocomplete T="Skill" Label="Choose a skill" MaxItems="null" @bind-Value="selectedSkill" ToStringFunc="@(selectedSkill => selectedSkill==null?null: $"{selectedSkill.Name}")" SearchFuncWithCancel="@Search" CoerceText="true">
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Class="px-4 py-1">
+                        No matching skills found
+                    </MudText>
+                
+                    <AfterItemsTemplate>
+                        <div class="pa-2">
+                            <MudButton Color="Color.Primary">Create new Skill</MudButton>
+                        </div>
+                    </AfterItemsTemplate>
+                </NoItemsTemplate>
+            </MudAutocomplete>
+            <MudText>Current Skillevel</MudText>
+            <MudRadioGroup @bind-Value="CurrentSkillLevel">
+                <MudRadio Value="@("1")">1</MudRadio>
+                <MudRadio Value="@("2")">2</MudRadio>
+                <MudRadio Value="@("3")">3</MudRadio>
+                <MudRadio Value="@("4")">4</MudRadio>
+                <MudRadio Value="@("5")">5</MudRadio>
+                <MudRadio Value="@("6")">6</MudRadio>
+            </MudRadioGroup>
+            <MudText>Desired Skillevel</MudText>
+            <MudRadioGroup @bind-Value="DesiredSkillLevel">
+                <MudRadio Value="@("1")">1</MudRadio>
+                <MudRadio Value="@("2")">2</MudRadio>
+                <MudRadio Value="@("3")">3</MudRadio>
+                <MudRadio Value="@("4")">4</MudRadio>
+                <MudRadio Value="@("5")">5</MudRadio>
+                <MudRadio Value="@("6")">6</MudRadio>
+            </MudRadioGroup>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add skill</MudButton>
+         </EditForm>
+    </div>
+</div>
+
+@code
+{
+     /*
+     * ToStringFunc="@(skill => skill==null?null: $"{skill.Name}")"
+    */
+    private Skill selectedSkill;
+    IEnumerable<Skill> skills;
+    public string CurrentSkillLevel { get; set; }
+    private string DesiredSkillLevel { get; set; }
+
+    private async Task HandleValidSubmit()
+    {           
+        //await SkillService.Add(skill);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedSkill = new Skill();
+        skills = await SkillService.GetAll();
+        // skillNames = skills.Select(s => s.Name).ToList();
+    }
+
+    private async Task<IEnumerable<Skill>> Search(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value)) return skills;
+        return skills.Where(skill => skill.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+
+    }
+}

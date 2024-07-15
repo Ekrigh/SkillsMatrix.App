@@ -1,0 +1,45 @@
+using Microsoft.EntityFrameworkCore;
+using SkillsMatrix.App.Components;
+using SkillsMatrix.Infrastructure;
+using SkillsMatrix.Infrastructure.Repositories;
+using SkillsMatrix.Infrastructure.Services.SkillService;
+using SkillsMatrix.Infrastructure.Services.UserService;
+using System.Configuration;
+using MudBlazor.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
+// Add services to the container.
+services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+//services.AddMudServices();
+services.AddMudServices(x =>
+x.PopoverOptions.ThrowOnDuplicateProvider = false);
+services.AddScoped<IUserService, UserService>();
+services.AddScoped<ISkillService, SkillService>();
+services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+services.AddDbContext<SMContext>(options =>
+{
+    options.UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion);
+});
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+app.UseAntiforgery();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
+
+app.Run();
