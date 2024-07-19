@@ -4,6 +4,8 @@ using SkillsMatrix.Infrastructure;
 using SkillsMatrix.Infrastructure.Repositories;
 using SkillsMatrix.Infrastructure.Services.SkillService;
 using SkillsMatrix.Infrastructure.Services.UserService;
+using SkillsMatrix.Infrastructure.Services.UserSkillRatingService;
+using SkillsMatrix.Infrastructure.Services.CategoryService;
 using System.Configuration;
 using MudBlazor.Services;
 
@@ -13,12 +15,16 @@ var configuration = builder.Configuration;
 // Add services to the container.
 services.AddRazorComponents()
     .AddInteractiveServerComponents();
-//services.AddMudServices();
+
 services.AddMudServices(x =>
 x.PopoverOptions.ThrowOnDuplicateProvider = false);
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ISkillService, SkillService>();
+services.AddScoped<ICategoryService, CategoryService>();
+services.AddScoped<IUserSkillRatingService, UserSkillRatingService>();
 services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+services.AddScoped(typeof(IUserSkillRatingRepository), typeof(UserSkillRatingRepository));
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
 services.AddDbContext<SMContext>(options =>
 {

@@ -10,8 +10,6 @@
     [Inject]
     private UserService UserService { get; set; }
 
-
-
     protected async override void OnInitialized()
     {
         skills = (ICollection<Skill>)await UserService.GetAll();

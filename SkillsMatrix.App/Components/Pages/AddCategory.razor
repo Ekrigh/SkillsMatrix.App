@@ -1,0 +1,39 @@
+﻿@page "/addcategory"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.CategoryService
+@inject ICategoryService categoryService;
+
+<PageTitle>New category</PageTitle>
+
+<h3>New Category</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@Category" FormName="AddCategory" OnValidSubmit="HandleValidSubmit">
+            <div class="mb-3">
+                <label for="name" class="form-label">Category name:</label>
+                <InputText id="name" @bind-Value="Category.Name" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </EditForm>
+    </div>
+</div>
+
+@code
+{
+    private Category Category { get; set; } = new Category();
+
+    private async Task HandleValidSubmit()
+    {
+        if (Category is null) return;
+        await categoryService.Add(Category);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+    }
+
+}

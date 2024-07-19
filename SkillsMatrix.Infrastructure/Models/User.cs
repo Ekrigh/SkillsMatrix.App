@@ -5,10 +5,9 @@ namespace SkillsMatrix.Infrastructure.Models
     public class User
     {
         public int Id { get; set; }
-        [Required]
-        public required string Name { get; set; }
-        [Required]
-        public required string Email { get; set; }
-        public ICollection<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public List<Skill> Skills { get; } = new();
+        public List<UserSkillRating> UserSkillRatings { get; } = new();
     }
 }

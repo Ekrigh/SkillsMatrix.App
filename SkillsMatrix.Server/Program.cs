@@ -18,8 +18,8 @@ services.AddDbContext<SMContext>(options =>
     options.UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion);
 });
 
-services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-services.AddScoped<IUserService, UserService>();
+//services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+//services.AddScoped<IUserService, UserService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();

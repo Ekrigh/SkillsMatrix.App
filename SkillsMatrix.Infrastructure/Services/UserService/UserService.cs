@@ -3,10 +3,10 @@ using SkillsMatrix.Infrastructure.Models;
 
 namespace SkillsMatrix.Infrastructure.Services.UserService
 {
-    public class UserService(IRepository<User> _userRepository) : IUserService
+    public class UserService(IUserRepository _userRepository) : IUserService
     {
 		
-        public async Task<User> GetUser(int userId)
+        public async Task<User> Get(int userId)
         {
 			try
 			{
@@ -25,7 +25,7 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
 		}
 
 
-		public async Task AddUser(User user)
+		public async Task Add(User user)
 		{
 			await _userRepository.Add(user);
 		}

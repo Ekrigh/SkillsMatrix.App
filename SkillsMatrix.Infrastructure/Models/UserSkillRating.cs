@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SkillsMatrix.Infrastructure.Models
 {
@@ -11,12 +6,12 @@ namespace SkillsMatrix.Infrastructure.Models
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        [Required]
-        public required User User { get; set; }
         public int SkillId { get; set; }
-        [Required]
-        public required Skill Skill { get; set; }
+        public User User { get; set; }
+        public Skill Skill { get; set; }
+       
         public int Rating { get; set; }
+        
         public int DesiredRating { get; set; }
     }
 }

@@ -11,5 +11,11 @@
         public SMContext(DbContextOptions<SMContext> options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>().HasMany(e => e.Skills).WithMany(e => e.Users).UsingEntity<UserSkillRating>();
+        }
     }
 }

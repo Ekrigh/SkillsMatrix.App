@@ -5,7 +5,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
 {
     public class Repository<T>(SMContext _smContext) : IRepository<T> where T : class
     {
-        
+
         public async Task<T> GetById(int id)
         {
             return await _smContext.Set<T>().FindAsync(id);

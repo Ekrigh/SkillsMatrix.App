@@ -3,8 +3,9 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
 {
     public interface IUserService
     {
-        Task<User> GetUser(int userId);
-        Task AddUser(User user);
+        Task<User> Get(int userId);
+        Task<IEnumerable<User>> GetAll();
+        Task Add(User user);
     
     }
 }

@@ -2,42 +2,78 @@
 @rendermode InteractiveServer
 @using SkillsMatrix.Infrastructure.Models
 @using SkillsMatrix.Infrastructure.Services.SkillService
-@inject ISkillService SkillService;
+@using SkillsMatrix.Infrastructure.Services.CategoryService
+@inject ISkillService skillService;
+@inject ICategoryService categoryService;
 
 <PageTitle>New Skill</PageTitle>
 
 <h3>New Skill</h3>
-<!--
-<MudAutocomplete T="string" Label="Choose a skill" ResetValueOnEmptyText="true" @bind-Value="Skill.Name" />
--->
 
 <div class="row">
     <div class="col-md-4">
-        <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
-            <div class="mb-3">
-                <label for="name" class="form-label">Skillname:</label>
-                <InputText id="name" @bind-Value="Skill.Name" class="form-control"/>
-            </div>
-            <button type="submit" class="btn btn-primary">Add Skill</button>
+        <EditForm Model="@NewSkill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
+            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                    <AfterItemsTemplate>
+                        <div class="pa-2">
+                            <MudButton>Create new Category</MudButton>
+                        </div>
+                    </AfterItemsTemplate>
+                </NoItemsTemplate>
+            </MudAutocomplete>
+            <MudAutocomplete T="string" Label="Choose a skill" MaxItems="null" @bind-Value="NewSkill.Name" @bind-Text="NewSkill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false">
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Class="px-4 py-1">No matching skills found</MudText>
+                    <AfterItemsTemplate>
+                        <div class="pa-2">
+                            <MudButton>Create new Skill</MudButton>
+                        </div>
+                    </AfterItemsTemplate>
+                </NoItemsTemplate>
+            </MudAutocomplete>
+            
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
         </EditForm>
     </div>
 </div>
 
 @code 
 {
-    private Skill Skill { get; set; } = new Skill();
-    //private string skill;
+    private Skill NewSkill { get; set; } = new();
+    private Category SelectedCategory { get; set; }
+    private IEnumerable<Skill> Skills { get; set; }
+    private IEnumerable<Category> Categories { get; set; }
 
     private async Task HandleValidSubmit()
     {
-        //if (skill is null) return;
-        //await SkillService.Add(Skill);
+        NewSkill.Category = SelectedCategory;
+        await skillService.Add(NewSkill);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        Skills = await skillService.GetAll();
+        Categories = await categoryService.GetAll();
+    }
 
+    private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)
+    {
+        var filteredSkills = SelectedCategory != null ? Skills.Where(skill => skill.CategoryId == SelectedCategory.Id).ToList() : 
+        Skills.ToList();
+
+        var skillNames = filteredSkills.Select(skill => skill.Name).ToList();
+
+        return string.IsNullOrEmpty(value) ? skillNames :
+        skillNames.Where(skill => skill.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
+    {
+        await Task.CompletedTask;
+        return string.IsNullOrEmpty(value) ? Categories :
+        Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
 }

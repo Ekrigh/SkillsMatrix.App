@@ -21,7 +21,7 @@ namespace SkillsMatrix.Infrastructure.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>
+            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,6 +34,28 @@ namespace SkillsMatrix.Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Skills");
                 });
@@ -88,10 +110,21 @@ namespace SkillsMatrix.Infrastructure.Migrations
                     b.ToTable("UserSkillRatings");
                 });
 
+            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>
+                {
+                    b.HasOne("SkillsMatrix.Infrastructure.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.UserSkillRating", b =>
                 {
                     b.HasOne("SkillsMatrix.Infrastructure.Models.Skill", "Skill")
-                        .WithMany()
+                        .WithMany("UserSkillRatings")
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -105,6 +138,11 @@ namespace SkillsMatrix.Infrastructure.Migrations
                     b.Navigation("Skill");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>
+                {
+                    b.Navigation("UserSkillRatings");
                 });
 
             modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.User", b =>

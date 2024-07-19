@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillsMatrix.Logic", "Skill
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkillsMatrix.Infrastructure", "SkillsMatrix.Infrastructure\SkillsMatrix.Infrastructure.csproj", "{3DF8FD41-13FD-4E9E-85ED-0A23F08E2994}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skillsmatrix.Domain", "Skillsmatrix.Domain\Skillsmatrix.Domain.csproj", "{23BB38FA-7ECA-43DB-A89D-A841EC248123}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{3DF8FD41-13FD-4E9E-85ED-0A23F08E2994}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DF8FD41-13FD-4E9E-85ED-0A23F08E2994}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DF8FD41-13FD-4E9E-85ED-0A23F08E2994}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23BB38FA-7ECA-43DB-A89D-A841EC248123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23BB38FA-7ECA-43DB-A89D-A841EC248123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23BB38FA-7ECA-43DB-A89D-A841EC248123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23BB38FA-7ECA-43DB-A89D-A841EC248123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

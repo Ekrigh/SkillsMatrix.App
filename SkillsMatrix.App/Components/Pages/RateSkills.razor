@@ -1,0 +1,86 @@
+﻿@page "/rateskills"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.UserSkillRatingService
+@using SkillsMatrix.Infrastructure.Services.CategoryService
+@using SkillsMatrix.Infrastructure.Services.UserService
+@using SkillsMatrix.Infrastructure.Services.SkillService
+
+@inject IUserSkillRatingService userSkillRatingService
+@inject ICategoryService categoryService
+@inject IUserService userService
+@inject ISkillService skillService
+
+<h3>rateSkills</h3>
+
+<div class="row">
+    <div class="col-md-4">
+            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+                <NoItemsTemplate>
+                    <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                </NoItemsTemplate>
+            </MudAutocomplete>
+    </div>
+</div>
+
+@if (SelectedCategory == null && (Skills == null || !Skills.Any()))
+{
+    <p>Please select a category.</p>
+}
+else
+{
+    @* var s = Skills.Where(skill => skill.Category == SelectedCategory).FirstOrDefault();
+    var d = Skills.Where(skill => skill.Category == SelectedCategory).Skip(1).FirstOrDefault();
+    //var f = Skills.Where(skill => skill.Category == SelectedCategory).ElementAt(2);
+    if (s != null)
+    {
+        <SkillRatingComponent Skill="s" User="currentUser" />
+    }
+    if(d != null)
+    {
+        <SkillRatingComponent Skill="d" User="currentUser" />
+    } *@
+    //<SkillRatingComponent Skill="f" User="currentUser" />
+
+    @foreach (var skill in Skills.Where(skill => skill.Category == SelectedCategory))
+    {
+        <SkillRatingComponent Skill="skill" User="currentUser" />
+    }
+    @* <EditForm OnValidSubmit="HandleValidSubmit">
+        @foreach (var skill in Skills.Where(skill => skill.Category == SelectedCategory))
+        {
+            <SkillRatingComponent Skill="skill" UserId="currentUser.Id" />
+        }
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+    </EditForm> *@
+} 
+
+
+@code 
+{
+    private User currentUser;
+    private UserSkillRating userSkillRating = new();
+    private Category SelectedCategory { get; set; }
+    private IEnumerable<Category> Categories { get; set; }
+    private IEnumerable<Skill> Skills { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await userService.Get(1);
+        Categories = await categoryService.GetAll();
+        Skills = await skillService.GetAll();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        userSkillRating.User = currentUser;
+        await userSkillRatingService.Add(userSkillRating);
+    }
+
+    private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
+    {
+        await Task.CompletedTask;
+        return string.IsNullOrEmpty(value) ? Categories :
+        Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}
