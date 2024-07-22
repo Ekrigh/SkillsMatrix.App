@@ -23,58 +23,85 @@
     </div>
 </div>
 
-@if (SelectedCategory == null && (Skills == null || !Skills.Any()))
+@if (SelectedCategory == null)
 {
     <p>Please select a category.</p>
 }
 else
 {
-    @* var s = Skills.Where(skill => skill.Category == SelectedCategory).FirstOrDefault();
-    var d = Skills.Where(skill => skill.Category == SelectedCategory).Skip(1).FirstOrDefault();
-    //var f = Skills.Where(skill => skill.Category == SelectedCategory).ElementAt(2);
-    if (s != null)
-    {
-        <SkillRatingComponent Skill="s" User="currentUser" />
-    }
-    if(d != null)
-    {
-        <SkillRatingComponent Skill="d" User="currentUser" />
-    } *@
-    //<SkillRatingComponent Skill="f" User="currentUser" />
-
-    @foreach (var skill in Skills.Where(skill => skill.Category == SelectedCategory))
-    {
-        <SkillRatingComponent Skill="skill" User="currentUser" />
-    }
-    @* <EditForm OnValidSubmit="HandleValidSubmit">
-        @foreach (var skill in Skills.Where(skill => skill.Category == SelectedCategory))
+    <EditForm Model="UserSkillRatings">
+        @foreach (var skill in SkillsByCategory)
         {
-            <SkillRatingComponent Skill="skill" UserId="currentUser.Id" />
-        }
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
-    </EditForm> *@
+            var userSkillRating = GetUserSkillRatingForSkill(skill);
+            <SkillRatingComponent Skill="skill" UserSkillRating="userSkillRating" OnUserSkillRatingChanged="UpdateUserSkillRating" />
+         }
+        <button type="submit" @onclick="SaveAllRatings">Save All Ratings</button>
+    </EditForm> 
 } 
-
 
 @code 
 {
     private User currentUser;
-    private UserSkillRating userSkillRating = new();
-    private Category SelectedCategory { get; set; }
+    private Category _selectedCategory;
+    [Parameter]
+    public Category SelectedCategory {
+        get => _selectedCategory;
+        set
+        {
+            if (_selectedCategory == value) return;
+            _selectedCategory = value;
+            SkillsByCategory = Skills.Where(skill => skill.Category == _selectedCategory).ToList();
+        }
+    }
+
     private IEnumerable<Category> Categories { get; set; }
-    private IEnumerable<Skill> Skills { get; set; } 
+    private IEnumerable<Skill> Skills { get; set; }
+    private List<Skill> SkillsByCategory { get; set; } = new();
+    private List<UserSkillRating> UserSkillRatings { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         currentUser = await userService.Get(1);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
+        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
     }
 
-    private async Task HandleValidSubmit()
+    private UserSkillRating GetUserSkillRatingForSkill(Skill skill)
     {
-        userSkillRating.User = currentUser;
-        await userSkillRatingService.Add(userSkillRating);
+        var userSkillRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        if (userSkillRating == null)
+        {
+            userSkillRating = new UserSkillRating
+                {
+                    UserId = currentUser.Id,
+                    SkillId = skill.Id,
+                    Skill = skill,
+                    User = currentUser,
+                };
+            UserSkillRatings.Add(userSkillRating);
+        }
+        return userSkillRating;
+    }
+
+    private async Task SaveAllRatings()
+    {
+        await userSkillRatingService.SaveAll(UserSkillRatings);
+        Console.WriteLine("All ratings have been saved.");
+    }
+
+    private void UpdateUserSkillRating(UserSkillRating updatedRating)
+    {
+        var existingRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == updatedRating.SkillId);
+        if (existingRating != null)
+        {
+            existingRating.Rating = updatedRating.Rating;
+            existingRating.DesiredRating = updatedRating.DesiredRating;
+        }
+        else
+        {
+            UserSkillRatings.Add(updatedRating);
+        }
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)

@@ -4,8 +4,9 @@ namespace SkillsMatrix.Infrastructure.Repositories
 {
     public interface IUserSkillRatingRepository : IRepository<UserSkillRating>
     {
-        Task<IEnumerable<UserSkillRating>> GetAllByUserId(int userId);
-        Task<UserSkillRating> GetByUserIdAndSkillId(int userId, int skillId);
+        Task<List<UserSkillRating>> GetAllByUserId(int userId);
+        UserSkillRating GetByUserIdAndSkillId(int userId, int skillId);
+        Task SaveAll(List<UserSkillRating> userSkillRatings);
     }
 }
 

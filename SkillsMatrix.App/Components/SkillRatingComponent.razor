@@ -6,16 +6,19 @@
 @inject IUserSkillRatingService UserService
 
 
-@if(UserSkillRating == null) {
+@if(UserSkillRating == null) 
+{
     <p>Loading...</p>
-} else {
-<div>
-    <h5>@Skill.Name</h5>
+} 
+else 
+{
+    <div>
+        <h5>@Skill.Name</h5>
         <label>Current Rating:</label>
-        <MudRating @bind-Value="UserSkillRating.Rating" MaxValue="6" FullIcon="@Icons.Material.Filled.Square" EmptyIcon="@Icons.Material.Filled.Square" FullIconColor="Color.Primary" EmptyIconColor="Color.Tertiary" />
+        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
         <label>Desired Rating:</label>
-        <MudRating @bind-Value="UserSkillRating.DesiredRating" MaxValue="6" FullIcon="@Icons.Material.Filled.Square"/>
-</div>
+        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6"/>
+    </div>
 }
 
 @code {
@@ -23,44 +26,13 @@
     public Skill Skill { get; set; }
 
     [Parameter]
-    public User User { get; set; }
+    public UserSkillRating UserSkillRating { get; set; }
 
-    private UserSkillRating UserSkillRating { get; set; }
+    [Parameter]
+    public EventCallback<UserSkillRating> OnUserSkillRatingChanged { get; set; }
 
-    // protected override async Task  OnParametersSetAsync()
-    // {
-    //     UserSkillRating = await UserSkillRatingService.GetByUserIdAndSkillId(User.Id, Skill.Id);
-    //     if(UserSkillRating == null) {
-
-    //         UserSkillRating = new UserSkillRating
-    //     {
-    //         UserId = User.Id,
-    //         SkillId = Skill.Id,
-    //         Skill = Skill,
-    //         User = User,
-    //     };
-    //     }
-    //     Console.WriteLine(UserSkillRating.Id);
-    // }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task OnRatingChanged()
     {
-        if(firstRender)
-        {
-            UserSkillRating = await UserSkillRatingService.GetByUserIdAndSkillId(User.Id, Skill.Id);
-            if (UserSkillRating == null)
-            {
-
-                UserSkillRating = new UserSkillRating
-                    {
-                        UserId = User.Id,
-                        SkillId = Skill.Id,
-                        Skill = Skill,
-                        User = User,
-                    };
-            }
-            Console.WriteLine(UserSkillRating.Id);
-        }
+        await OnUserSkillRatingChanged.InvokeAsync(UserSkillRating);
     }
-
 }

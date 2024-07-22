@@ -20,10 +20,10 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
 
         public async Task<UserSkillRating> GetByUserIdAndSkillId(int userId, int skillId)
         {
-            return await _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
+            return _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
         }
 
-        public async Task<IEnumerable<UserSkillRating>> GetAllByUserId(int id)
+        public async Task<List<UserSkillRating>> GetAllByUserId(int id)
         {
             try
             {
@@ -43,6 +43,11 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
         public async Task Add(UserSkillRating userSkillRating)
         {
             await _userSkillRatingRepository.Add(userSkillRating);
+        }
+
+        public async Task SaveAll(List<UserSkillRating> userSkillRatings)
+        {
+             _userSkillRatingRepository.SaveAll(userSkillRatings);
         }
     }
 }
