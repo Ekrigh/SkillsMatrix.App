@@ -5,8 +5,10 @@ namespace SkillsMatrix.Infrastructure.Models
     public class Skill
     {
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
         public int CategoryId { get; set; }
+        [Required]
         public Category Category { get; set; }
         public List<User> Users { get; } = new();
         public List<UserSkillRating> UserSkillRatings { get; } = new();

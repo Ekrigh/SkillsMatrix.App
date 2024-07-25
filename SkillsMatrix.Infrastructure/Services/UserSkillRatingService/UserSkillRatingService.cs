@@ -47,7 +47,7 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
 
         public async Task SaveAll(List<UserSkillRating> userSkillRatings)
         {
-             _userSkillRatingRepository.SaveAll(userSkillRatings);
+            _userSkillRatingRepository.SaveAll(userSkillRatings);
         }
     }
 }

@@ -1,8 +1,4 @@
 ﻿@page "/"
-@rendermode InteractiveServer
-@using SkillsMatrix.Infrastructure.Models
-@using SkillsMatrix.Infrastructure.Services.UserService
-@using SkillsMatrix.Infrastructure.Services.SkillService
 @inject IUserService userService
 @inject ISkillService skillService
 
@@ -21,19 +17,19 @@ else
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false"/>
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" />
             @foreach (var skill in Skills)
             {
                 <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation" />
             }
         </Columns>
-</MudDataGrid>
+    </MudDataGrid>
 }
 
 @code {
 
     private IEnumerable<User> Users { get; set; } = new List<User>();
-    private IEnumerable<Skill> Skills { get; set; } 
+    private IEnumerable<Skill> Skills { get; set; }
     private MudDataGrid<User> matrixGrid;
     private string _searchString;
     private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
@@ -44,9 +40,9 @@ else
 
     private Func<User, bool> _quickFilter => user =>
       {
-      if (string.IsNullOrWhiteSpace(_searchString)) return true;
-      if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-      return false;
+          if (string.IsNullOrWhiteSpace(_searchString)) return true;
+          if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+          return false;
       };
 
 
@@ -97,8 +93,8 @@ else
     private async void ClearFilters()
     {
         matrixGrid.ClearFiltersAsync();
-        
-        foreach(var column in matrixGrid.RenderedColumns)
+
+        foreach (var column in matrixGrid.RenderedColumns)
         {
             await column.ShowAsync();
         }
@@ -109,8 +105,7 @@ else
         matrixGrid.ShowColumnsPanel();
     }
 
-   
-}
-    
 
-                
+}
+
+

@@ -1,8 +1,4 @@
 ﻿@page "/manageskills"
-@rendermode InteractiveServer
-@using SkillsMatrix.Infrastructure.Models
-@using SkillsMatrix.Infrastructure.Services.SkillService
-@using SkillsMatrix.Infrastructure.Services.CategoryService
 @inject ISkillService skillService;
 @inject ICategoryService categoryService;
 
@@ -10,41 +6,29 @@
 
 <h3>Manage Skill</h3>
 
+<div class="col-md-4">
+    <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true" Required="true" For="@(() => Skill.Category)">
+            <NoItemsTemplate>
+                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                <MudLink Href="managecategories"><MudButton>Create new Category</MudButton></MudLink>
+            </NoItemsTemplate>
+        </MudAutocomplete>
 
-    <div class="col-md-4">
-        <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
-            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true">
-                <NoItemsTemplate>
-                    <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
-                    <AfterItemsTemplate>
-                        <div class="pa-2">
-                            <MudButton>Create new Category</MudButton>
-                        </div>
-                    </AfterItemsTemplate>
-                </NoItemsTemplate>
-            </MudAutocomplete>
-            <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" @bind-Text="Skill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false">
-                <NoItemsTemplate>
-                    <MudText Align="Align.Center" Class="px-4 py-1">No matching skills found</MudText>
-                    <AfterItemsTemplate>
-                        <div class="pa-2">
-                            <MudButton>Create new Skill</MudButton>
-                        </div>
-                    </AfterItemsTemplate>
-                </NoItemsTemplate>
-            </MudAutocomplete>
-            
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
-            <MudButton @onclick="DeleteSkill">Delete</MudButton>
-            @if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                <MudText Color="Color.Error">@ErrorMessage</MudText>
-            }
-        </EditForm>
-    </div>
+        <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" @bind-Text="Skill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false" Required="true" For="@(() => Skill.Name)">
+        </MudAutocomplete>
 
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+        <MudButton @onclick="DeleteSkill">Delete</MudButton>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudText Color="Color.Error">@ErrorMessage</MudText>
+        }
+    </EditForm>
+</div>
 
-@code 
+@code
 {
     private Skill Skill { get; set; } = new();
     private Category SelectedCategory { get; set; }
@@ -54,7 +38,8 @@
 
     private async Task HandleValidSubmit()
     {
-        if (Skills.Any(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase))) {
+        if (Skills.Any(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase)))
+        {
             ErrorMessage = "The skill already exists";
             return;
         }
@@ -64,7 +49,7 @@
         Skills = await skillService.GetAll();
     }
 
-    private async Task DeleteSkill() 
+    private async Task DeleteSkill()
     {
         var skillToDelete = Skills.FirstOrDefault(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase));
         if (skillToDelete == null)
@@ -85,7 +70,8 @@
 
     private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)
     {
-        var filteredSkills = SelectedCategory != null ? Skills.Where(skill => skill.CategoryId == SelectedCategory.Id).ToList() : 
+        await Task.CompletedTask;
+        var filteredSkills = SelectedCategory != null ? Skills.Where(skill => skill.CategoryId == SelectedCategory.Id).ToList() :
         Skills.ToList();
 
         var skillNames = filteredSkills.Select(skill => skill.Name).ToList();

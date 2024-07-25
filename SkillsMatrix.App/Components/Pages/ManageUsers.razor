@@ -1,8 +1,4 @@
 ﻿@page "/manageusers"
-@rendermode InteractiveServer
-@using SkillsMatrix.Infrastructure.Models
-@using SkillsMatrix.Infrastructure.Services.UserService
-@using SkillsMatrix.Infrastructure.Services.SkillService
 @inject IUserService userService;
 @inject ISkillService skillService
 
@@ -10,27 +6,28 @@
 
 <h3>Manage User</h3>
 
-    <div class="col-md-4">
-        <EditForm Model="@User" FormName="AddUser" OnValidSubmit="HandleValidSubmit">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name:</label>
-                <InputText id="name" @bind-Value="User.Name" class="form-control" />
-                <label for="email" class="form-label">E-mail:</label>
-                <InputText id="email" @bind-Value="User.Email" class="form-control" />
-            </div>
+<div class="col-md-4">
+    <EditForm Model="@User" FormName="AddUser" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+            <label for="Name" class="form-label">Name:</label>
+            <InputText id="Name" @bind-Value="User.Name" class="form-control" />
+            <ValidationMessage For="() => User.Name" />
+            <label for="Email" class="form-label">E-mail:</label>
+            <InputText id="Email" @bind-Value="User.Email" class="form-control" />
+            <ValidationMessage For="() => User.Email" />
+        
         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
         <MudButton @onclick="DeleteUser">Delete</MudButton>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
             <MudText Color="Color.Error">@ErrorMessage</MudText>
         }
-        </EditForm>
-    </div>
-
+    </EditForm>
+</div>
 
 @code
 {
-    private User User { get; set; } = new ();
+    private User User { get; set; } = new();
     private IEnumerable<User> Users { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
     private string ErrorMessage;
@@ -65,7 +62,6 @@
     {
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
-
     }
 
     private async Task InitialiseUserSkillRatings(User user)
@@ -73,15 +69,16 @@
         foreach (var skill in Skills)
         {
             user.UserSkillRatings.Add(new UserSkillRating
-            {
-                UserId = user.Id,
-                SkillId = skill.Id,
-                Rating = 0
-            });
+                {
+                    UserId = user.Id,
+                    SkillId = skill.Id,
+                    Rating = 0,
+                    DesiredRating = 0
+                });
         }
-    }     
-        
+    }
 
-        
+
+
 
 }

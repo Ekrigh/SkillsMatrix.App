@@ -1,11 +1,4 @@
 ﻿@page "/rateskills"
-@rendermode InteractiveServer
-@using SkillsMatrix.Infrastructure.Models
-@using SkillsMatrix.Infrastructure.Services.UserSkillRatingService
-@using SkillsMatrix.Infrastructure.Services.CategoryService
-@using SkillsMatrix.Infrastructure.Services.UserService
-@using SkillsMatrix.Infrastructure.Services.SkillService
-
 @inject IUserSkillRatingService userSkillRatingService
 @inject ICategoryService categoryService
 @inject IUserService userService
@@ -15,11 +8,11 @@
 
 <div class="row">
     <div class="col-md-4">
-            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
-                <NoItemsTemplate>
-                    <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
-                </NoItemsTemplate>
-            </MudAutocomplete>
+        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+            <NoItemsTemplate>
+                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+            </NoItemsTemplate>
+        </MudAutocomplete>
     </div>
 </div>
 
@@ -34,17 +27,18 @@ else
         {
             var userSkillRating = GetUserSkillRatingForSkill(skill);
             <SkillRatingComponent UserSkillRating="userSkillRating" OnUserSkillRatingChanged="UpdateUserSkillRating" />
-         }
+        }
         <MudButton ButtonType="ButtonType.Submit" @onclick="SaveAllRatings" Variant="Variant.Filled" Color="Color.Primary">Save All Ratings</MudButton>
-    </EditForm> 
-} 
+    </EditForm>
+}
 
-@code 
+@code
 {
     private User currentUser;
     private Category _selectedCategory;
     [Parameter]
-    public Category SelectedCategory {
+    public Category SelectedCategory
+    {
         get => _selectedCategory;
         set
         {

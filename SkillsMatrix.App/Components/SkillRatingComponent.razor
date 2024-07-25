@@ -6,18 +6,18 @@
 @inject IUserSkillRatingService UserService
 
 
-@if(UserSkillRating == null) 
+@if (UserSkillRating == null)
 {
     <p>Loading...</p>
-} 
-else 
+}
+else
 {
     <div>
         <h5>@UserSkillRating.Skill.Name</h5>
         <label>Current Rating:</label>
         <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
         <label>Desired Rating:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6"/>
+        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6" />
     </div>
 }
 

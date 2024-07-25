@@ -12,7 +12,7 @@ namespace SkillsMatrix.Infrastructure.Services
         public bool IsInitialized { get; set; }
         public async Task InitialiseState()
         {
-            if(IsInitialized) return;
+            if (IsInitialized) return;
             Users = await _userService.GetAll();
             Skills = await _skillService.GetAll();
             await InitialiseUserSkillRatings();
@@ -45,5 +45,5 @@ namespace SkillsMatrix.Infrastructure.Services
         }
     }
 
- 
+
 }

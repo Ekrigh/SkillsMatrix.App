@@ -13,7 +13,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
 
         public UserSkillRating GetByUserIdAndSkillId(int userId, int skillId)
         {
-            return  _smContext.UserSkillRatings
+            return _smContext.UserSkillRatings
             .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
         }
 
@@ -32,7 +32,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
                 }
                 else
                 {
-                   await _smContext.UserSkillRatings.AddAsync(userSkillRating);
+                    await _smContext.UserSkillRatings.AddAsync(userSkillRating);
                 }
             }
             _smContext.SaveChangesAsync();
