@@ -1,0 +1,71 @@
+﻿@page "/managecategories"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.CategoryService
+@inject ICategoryService categoryService;
+
+<PageTitle>Manage category</PageTitle>
+
+<h3>Manage Category</h3>
+
+<div class="col-md-4">
+    <EditForm Model="@Category" FormName="AddCategory" OnValidSubmit="HandleValidSubmit">
+        <MudAutocomplete T="string" Label="Enter Category name" MaxItems="null" @bind-Value="Category.Name" @bind-Text="Category.Name" SearchFuncWithCancel="@SearchCategory" CoerceText="false">
+             <NoItemsTemplate>
+                  <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+             </NoItemsTemplate>
+        </MudAutocomplete>
+           
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+    <MudButton @onclick="DeleteCategory">Delete</MudButton>
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <MudText Color="Color.Error">@ErrorMessage</MudText>
+            }
+    </EditForm>
+</div>
+
+@code 
+{
+    private Category Category { get; set; } = new();
+    private IEnumerable<Category> Categories { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Categories.Any(category => category.Name.Equals(Category.Name, StringComparison.InvariantCultureIgnoreCase))) {
+            ErrorMessage = "The category already exists";
+            return;
+        }
+        ErrorMessage = string.Empty;
+        
+        await categoryService.Add(Category);
+        Categories = await categoryService.GetAll();
+    }
+
+    private async Task DeleteCategory() 
+    {
+        var categoryToDelete = Categories.FirstOrDefault(category => category.Name.Equals(Category.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (categoryToDelete == null)
+        {
+            ErrorMessage = "The category does not exist";
+            return;
+        }
+        ErrorMessage = string.Empty;
+        await categoryService.Delete(categoryToDelete);
+        Categories = await categoryService.GetAll();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await categoryService.GetAll();
+    }
+    
+    private async Task<IEnumerable<string>> SearchCategory(string value, CancellationToken token)
+    {
+        var CategoryNames = Categories.Select(category => category.Name).ToList();
+        return string.IsNullOrEmpty(value) ? CategoryNames :
+        CategoryNames.Where(category => category.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+}

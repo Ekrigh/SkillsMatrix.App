@@ -13,7 +13,7 @@
 else 
 {
     <div>
-        <h5>@Skill.Name</h5>
+        <h5>@UserSkillRating.Skill.Name</h5>
         <label>Current Rating:</label>
         <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
         <label>Desired Rating:</label>
@@ -22,9 +22,6 @@ else
 }
 
 @code {
-    [Parameter]
-    public Skill Skill { get; set; }
-
     [Parameter]
     public UserSkillRating UserSkillRating { get; set; }
 

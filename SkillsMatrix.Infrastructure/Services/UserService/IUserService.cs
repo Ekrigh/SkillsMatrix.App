@@ -6,6 +6,9 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
         Task<User> Get(int userId);
         Task<IEnumerable<User>> GetAll();
         Task Add(User user);
-    
+        Task Delete(User user);
+        Task Update(User user);
+        Task UpdateAll(IEnumerable<User> users);
+
     }
 }

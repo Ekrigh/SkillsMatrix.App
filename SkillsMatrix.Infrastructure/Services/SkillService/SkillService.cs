@@ -29,7 +29,12 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
             await _skillRepository.Add(skill);
         }
 
-        
+        public async Task Delete(Skill skill)
+        {
+            await _skillRepository.Remove(skill);
+        }
+
+
 
 
     }

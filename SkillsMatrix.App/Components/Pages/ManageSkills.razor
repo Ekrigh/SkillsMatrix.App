@@ -1,4 +1,4 @@
-﻿@page "/addskill"
+﻿@page "/manageskills"
 @rendermode InteractiveServer
 @using SkillsMatrix.Infrastructure.Models
 @using SkillsMatrix.Infrastructure.Services.SkillService
@@ -6,14 +6,14 @@
 @inject ISkillService skillService;
 @inject ICategoryService categoryService;
 
-<PageTitle>New Skill</PageTitle>
+<PageTitle>Manage Skill</PageTitle>
 
-<h3>New Skill</h3>
+<h3>Manage Skill</h3>
 
-<div class="row">
+
     <div class="col-md-4">
-        <EditForm Model="@NewSkill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
-            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+        <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
+            <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true">
                 <NoItemsTemplate>
                     <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
                     <AfterItemsTemplate>
@@ -23,7 +23,7 @@
                     </AfterItemsTemplate>
                 </NoItemsTemplate>
             </MudAutocomplete>
-            <MudAutocomplete T="string" Label="Choose a skill" MaxItems="null" @bind-Value="NewSkill.Name" @bind-Text="NewSkill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false">
+            <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" @bind-Text="Skill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false">
                 <NoItemsTemplate>
                     <MudText Align="Align.Center" Class="px-4 py-1">No matching skills found</MudText>
                     <AfterItemsTemplate>
@@ -34,22 +34,47 @@
                 </NoItemsTemplate>
             </MudAutocomplete>
             
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Submit</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+            <MudButton @onclick="DeleteSkill">Delete</MudButton>
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <MudText Color="Color.Error">@ErrorMessage</MudText>
+            }
         </EditForm>
     </div>
-</div>
+
 
 @code 
 {
-    private Skill NewSkill { get; set; } = new();
+    private Skill Skill { get; set; } = new();
     private Category SelectedCategory { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
     private IEnumerable<Category> Categories { get; set; }
+    private string ErrorMessage { get; set; }
 
     private async Task HandleValidSubmit()
     {
-        NewSkill.Category = SelectedCategory;
-        await skillService.Add(NewSkill);
+        if (Skills.Any(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase))) {
+            ErrorMessage = "The skill already exists";
+            return;
+        }
+        ErrorMessage = string.Empty;
+        Skill.Category = SelectedCategory;
+        await skillService.Add(Skill);
+        Skills = await skillService.GetAll();
+    }
+
+    private async Task DeleteSkill() 
+    {
+        var skillToDelete = Skills.FirstOrDefault(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (skillToDelete == null)
+        {
+            ErrorMessage = "The skill does not exist";
+            return;
+        }
+        ErrorMessage = string.Empty;
+        await skillService.Delete(skillToDelete);
+        Skills = await skillService.GetAll();
     }
 
     protected override async Task OnInitializedAsync()

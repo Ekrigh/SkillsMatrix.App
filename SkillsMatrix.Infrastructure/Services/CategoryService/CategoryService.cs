@@ -29,6 +29,11 @@ namespace SkillsMatrix.Infrastructure.Services.CategoryService
             await _categoryRepository.Add(category);
         }
 
+        public async Task Delete(Category category)
+        {
+            await _categoryRepository.Remove(category);
+        }
+
 
 
 

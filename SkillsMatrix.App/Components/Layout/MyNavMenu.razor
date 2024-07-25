@@ -1,12 +1,13 @@
 ﻿<MudNavMenu>
+    <MudLink Href="#">
+        <MudImage src="..\..\Content\BL-darkMode-logga-2rad.png" alt="Bjorn Lunden logo" Fluid="true" Class="bl-blue-500 pa-5" />
+    </MudLink>
+   
     <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavLink Href="/myskills" Match="NavLinkMatch.All">My Skills</MudNavLink>
-    <MudNavLink Href="/addskill" Match="NavLinkMatch.All">Add Skills</MudNavLink>
-    <MudNavLink Href="/skills" Match="NavLinkMatch.All">edit Skills</MudNavLink>
-    <MudNavLink Href="/users" Match="NavLinkMatch.All">Users</MudNavLink>
+    <MudNavLink Href="/rateskills" Match="NavLinkMatch.All">Rate Skills</MudNavLink>
     <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+        <MudNavLink Href="/manageskills" Match="NavLinkMatch.All">Manage Skills</MudNavLink>
+        <MudNavLink Href="/managecategories" Match="NavLinkMatch.All">Manage Categories</MudNavLink>
+        <MudNavLink Href="/manageusers" Match="NavLinkMatch.All">Manage Users</MudNavLink>
     </MudNavGroup>
-    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
 </MudNavMenu>

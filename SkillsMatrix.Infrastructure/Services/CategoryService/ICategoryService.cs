@@ -7,7 +7,7 @@ namespace SkillsMatrix.Infrastructure.Services.CategoryService
         Task<Category> GetById(int Id);
         Task<IEnumerable<Category>> GetAll();
         Task Add(Category category);
-
+        Task Delete(Category category);
 
 
     }

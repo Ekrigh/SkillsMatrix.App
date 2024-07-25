@@ -7,7 +7,9 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
         Task<Skill> GetById(int Id);
         Task<IEnumerable<Skill>> GetAll();
         Task Add(Skill skill);
+        Task Delete(Skill skill);
         
+
 
 
     }

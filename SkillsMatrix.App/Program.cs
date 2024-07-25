@@ -8,6 +8,7 @@ using SkillsMatrix.Infrastructure.Services.UserSkillRatingService;
 using SkillsMatrix.Infrastructure.Services.CategoryService;
 using System.Configuration;
 using MudBlazor.Services;
+using SkillsMatrix.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -18,6 +19,7 @@ services.AddRazorComponents()
 
 services.AddMudServices(x =>
 x.PopoverOptions.ThrowOnDuplicateProvider = false);
+services.AddScoped<AppState>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ISkillService, SkillService>();
 services.AddScoped<ICategoryService, CategoryService>();

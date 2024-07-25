@@ -33,9 +33,9 @@ else
         @foreach (var skill in SkillsByCategory)
         {
             var userSkillRating = GetUserSkillRatingForSkill(skill);
-            <SkillRatingComponent Skill="skill" UserSkillRating="userSkillRating" OnUserSkillRatingChanged="UpdateUserSkillRating" />
+            <SkillRatingComponent UserSkillRating="userSkillRating" OnUserSkillRatingChanged="UpdateUserSkillRating" />
          }
-        <button type="submit" @onclick="SaveAllRatings">Save All Ratings</button>
+        <MudButton ButtonType="ButtonType.Submit" @onclick="SaveAllRatings" Variant="Variant.Filled" Color="Color.Primary">Save All Ratings</MudButton>
     </EditForm> 
 } 
 

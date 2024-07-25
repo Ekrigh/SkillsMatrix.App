@@ -28,9 +28,19 @@ namespace SkillsMatrix.Infrastructure.Repositories
             await _smContext.SaveChangesAsync();
         }
 
+        public async Task UpdateAll(IEnumerable<T> entities)
+        {
+            if (entities == null || !entities.Any())
+                throw new ArgumentException("The entities collection cannot be null or empty.", nameof(entities));
+
+            _smContext.Set<T>().UpdateRange(entities);
+            await _smContext.SaveChangesAsync();
+        }
+
         public async Task Remove(T entity)
         {
-             _smContext.Set<T>().Remove(entity);
+              _smContext.Set<T>().Remove(entity);
+            await _smContext.SaveChangesAsync();
 
         }
     }

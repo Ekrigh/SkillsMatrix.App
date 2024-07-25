@@ -1,0 +1,116 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using SkillsMatrix.Infrastructure.Models
+@using SkillsMatrix.Infrastructure.Services.UserService
+@using SkillsMatrix.Infrastructure.Services.SkillService
+@inject IUserService userService
+@inject ISkillService skillService
+
+
+@if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
+{
+    <p>Loading...</p>
+}
+else
+{
+    <MudDataGrid Class="mt-2" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudFab Class="" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
+            <MudFab Class="ml-1" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
+            <MudTextField Class="ml-1 mb-5" @bind-Value="_searchString" Placeholder="Search user" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false"/>
+            @foreach (var skill in Skills)
+            {
+                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation" />
+            }
+        </Columns>
+</MudDataGrid>
+}
+
+@code {
+
+    private IEnumerable<User> Users { get; set; } = new List<User>();
+    private IEnumerable<Skill> Skills { get; set; } 
+    private MudDataGrid<User> matrixGrid;
+    private string _searchString;
+    private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
+        {
+            Type = AggregateType.Sum,
+            DisplayFormat = "Total: {value}"
+        };
+
+    private Func<User, bool> _quickFilter => user =>
+      {
+      if (string.IsNullOrWhiteSpace(_searchString)) return true;
+      if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+      return false;
+      };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await userService.GetAll();
+        Skills = await skillService.GetAll();
+
+    }
+
+    private int? GetUserSkillRating(User user, Skill skill)
+    {
+        return user.UserSkillRatings.First(usr => usr.SkillId == skill.Id)?.Rating;
+    }
+
+    private Func<User, Skill, string> _cellStyleFunc => (user, skill) =>
+    {
+        string style = "";
+        int? rating = GetUserSkillRating(user, skill);
+
+        switch (rating)
+        {
+            case 1:
+                style = "background-color:#FF0000";
+                break;
+            case 2:
+                style = "background-color:#FFA500";
+                break;
+            case 3:
+                style = "background-color:#FFFF00";
+                break;
+            case 4:
+                style = "background-color:#66CDAA";
+                break;
+            case 5:
+                style = "background-color:#90EE90";
+                break;
+            case 6:
+                style = "background-color:#32CD32; font-weight:bold";
+                break;
+            default:
+                style = "background-color:#FFFFFF";
+                break;
+        }
+        return style;
+    };
+
+    private async void ClearFilters()
+    {
+        matrixGrid.ClearFiltersAsync();
+        
+        foreach(var column in matrixGrid.RenderedColumns)
+        {
+            await column.ShowAsync();
+        }
+    }
+
+    private void ShowColumnsMenu()
+    {
+        matrixGrid.ShowColumnsPanel();
+    }
+
+   
+}
+    
+
+                
