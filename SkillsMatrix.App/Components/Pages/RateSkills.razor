@@ -18,13 +18,13 @@
 
 @if (SelectedCategory != null)
 {
-    <EditForm Model="UserSkillRatings">
+    <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit">
         @foreach (var skill in SkillsByCategory)
         {
-            var userSkillRating = GetUserSkillRatingForSkill(skill);
+            var userSkillRating = GetTempUserSkillRatingForSkill(skill);
             <SkillRatingComponent UserSkillRating="userSkillRating" />
         }
-        <MudButton ButtonType="ButtonType.Submit" @onclick="SaveAllRatings" Variant="Variant.Filled" Color="Color.Primary">Save All Ratings</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Save All Ratings</MudButton>
     </EditForm>
 }
 
@@ -48,6 +48,7 @@
     private IEnumerable<Skill> Skills { get; set; }
     private List<Skill> SkillsByCategory { get; set; } = new();
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
+    private List<UserSkillRating> TempUserSkillRatings { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,11 +56,12 @@
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
+        TempUserSkillRatings = CreateDeepCopy(UserSkillRatings);
     }
 
-    private UserSkillRating GetUserSkillRatingForSkill(Skill skill)
+    private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
     {
-        var userSkillRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        var userSkillRating = TempUserSkillRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
         if (userSkillRating == null)
         {
             userSkillRating = new UserSkillRating
@@ -69,21 +71,28 @@
                     Skill = skill,
                     User = currentUser,
                 };
-            UserSkillRatings.Add(userSkillRating);
+            TempUserSkillRatings.Add(userSkillRating);
         }
         return userSkillRating;
     }
 
-    private async Task SaveAllRatings()
+    private async Task HandleValidSubmit()
     {
-        await userSkillRatingService.SaveAll(UserSkillRatings);
-    }
+        foreach (var tempRating in TempUserSkillRatings)
+        {
+            var originalRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == tempRating.SkillId);
+            if (originalRating != null)
+            {
+                originalRating.Rating = tempRating.Rating;
+                originalRating.DesiredRating = tempRating.DesiredRating;
+            }
+            else
+            {
+                UserSkillRatings.Add(tempRating);
+            }
+        }
 
-    private void UpdateUserSkillRating(UserSkillRating updatedRating)
-    {
-        var oldRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == updatedRating.SkillId);
-            oldRating.Rating = updatedRating.Rating;
-            oldRating.DesiredRating = updatedRating.DesiredRating;
+        await userSkillRatingService.SaveAll(UserSkillRatings);
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
@@ -91,5 +100,18 @@
         await Task.CompletedTask;
         return string.IsNullOrEmpty(value) ? Categories :
         Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private List<UserSkillRating> CreateDeepCopy(List<UserSkillRating> originalList)
+    {
+        return originalList.Select(item => new UserSkillRating
+            {
+                UserId = item.UserId,
+                SkillId = item.SkillId,
+                Skill = item.Skill,
+                User = item.User,
+                Rating = item.Rating,
+                DesiredRating = item.DesiredRating
+            }).ToList();
     }
 }

@@ -12,4 +12,4 @@ namespace Skillsmatrix.Domain
         public int DesiredRating { get; set; }
     }
 }
-}
+
