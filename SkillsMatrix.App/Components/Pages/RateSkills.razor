@@ -16,17 +16,13 @@
     </div>
 </div>
 
-@if (SelectedCategory == null)
-{
-    <p>Please select a category.</p>
-}
-else
+@if (SelectedCategory != null)
 {
     <EditForm Model="UserSkillRatings">
         @foreach (var skill in SkillsByCategory)
         {
             var userSkillRating = GetUserSkillRatingForSkill(skill);
-            <SkillRatingComponent UserSkillRating="userSkillRating" OnUserSkillRatingChanged="UpdateUserSkillRating" />
+            <SkillRatingComponent UserSkillRating="userSkillRating" />
         }
         <MudButton ButtonType="ButtonType.Submit" @onclick="SaveAllRatings" Variant="Variant.Filled" Color="Color.Primary">Save All Ratings</MudButton>
     </EditForm>
@@ -81,21 +77,13 @@ else
     private async Task SaveAllRatings()
     {
         await userSkillRatingService.SaveAll(UserSkillRatings);
-        Console.WriteLine("All ratings have been saved.");
     }
 
     private void UpdateUserSkillRating(UserSkillRating updatedRating)
     {
-        var existingRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == updatedRating.SkillId);
-        if (existingRating != null)
-        {
-            existingRating.Rating = updatedRating.Rating;
-            existingRating.DesiredRating = updatedRating.DesiredRating;
-        }
-        else
-        {
-            UserSkillRatings.Add(updatedRating);
-        }
+        var oldRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == updatedRating.SkillId);
+            oldRating.Rating = updatedRating.Rating;
+            oldRating.DesiredRating = updatedRating.DesiredRating;
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)

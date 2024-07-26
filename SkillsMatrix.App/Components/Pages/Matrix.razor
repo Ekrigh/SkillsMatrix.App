@@ -45,17 +45,16 @@ else
           return false;
       };
 
-
     protected override async Task OnInitializedAsync()
     {
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
-
     }
 
-    private int? GetUserSkillRating(User user, Skill skill)
+    private int GetUserSkillRating(User user, Skill skill)
     {
-        return user.UserSkillRatings.First(usr => usr.SkillId == skill.Id)?.Rating;
+        var userSkillRating = user.UserSkillRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        return userSkillRating?.Rating ?? 0;
     }
 
     private Func<User, Skill, string> _cellStyleFunc => (user, skill) =>

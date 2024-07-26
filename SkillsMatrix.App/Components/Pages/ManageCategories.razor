@@ -8,9 +8,9 @@
 <div class="col-md-4">
     <EditForm Model="@Category" FormName="AddCategory" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-        <MudAutocomplete T="string" Label="Enter Category name" MaxItems="null" @bind-Value="Category.Name" @bind-Text="Category.Name" SearchFuncWithCancel="@SearchCategory" CoerceText="false" Required="true" For="@(() => Category.Name)">
+        <MudAutocomplete T="string" Label="Enter category name" MaxItems="null" @bind-Value="Category.Name" SearchFuncWithCancel="@SearchCategory" CoerceValue="true" CoerceText="true" Required="true" For="@(() => Category.Name)">
             <NoItemsTemplate>
-                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                <MudText Align="Align.Center" Class="px-4 py-1">Skill to be added: @Category.Name</MudText>
             </NoItemsTemplate>
         </MudAutocomplete>
 
@@ -66,5 +66,4 @@
         return string.IsNullOrEmpty(value) ? CategoryNames :
         CategoryNames.Where(category => category.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
-
 }

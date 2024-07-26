@@ -1,6 +1,7 @@
 ﻿@page "/manageskills"
 @inject ISkillService skillService;
 @inject ICategoryService categoryService;
+@inject IUserService userService;
 
 <PageTitle>Manage Skill</PageTitle>
 
@@ -9,15 +10,19 @@
 <div class="col-md-4">
     <EditForm Model="@Skill" FormName="AddSkill" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true" Required="true" For="@(() => Skill.Category)">
+        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="Skill.Category" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true" Required="true" For="@(() => Skill.Category)">
             <NoItemsTemplate>
                 <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
                 <MudLink Href="managecategories"><MudButton>Create new Category</MudButton></MudLink>
             </NoItemsTemplate>
         </MudAutocomplete>
 
-        <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" @bind-Text="Skill.Name" SearchFuncWithCancel="@SearchSkill" CoerceText="false" Required="true" For="@(() => Skill.Name)">
-        </MudAutocomplete>
+        <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" SearchFuncWithCancel="@SearchSkill" ResetValueOnEmptyText="true" CoerceValue="true" CoerceText="true" Required="true" For="@(() => Skill.Name)">
+            <NoItemsTemplate>
+                <MudText Align="Align.Center" Class="px-4 py-1">Skill to be added: @Skill.Name</MudText>
+            </NoItemsTemplate>
+               
+       </MudAutocomplete>
 
         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
         <MudButton @onclick="DeleteSkill">Delete</MudButton>
@@ -31,8 +36,8 @@
 @code
 {
     private Skill Skill { get; set; } = new();
-    private Category SelectedCategory { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
+    private IEnumerable<User> Users { get; set; }
     private IEnumerable<Category> Categories { get; set; }
     private string ErrorMessage { get; set; }
 
@@ -44,9 +49,9 @@
             return;
         }
         ErrorMessage = string.Empty;
-        Skill.Category = SelectedCategory;
         await skillService.Add(Skill);
         Skills = await skillService.GetAll();
+        Skill = new Skill();
     }
 
     private async Task DeleteSkill()
@@ -64,27 +69,29 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Users = await userService.GetAll();
         Skills = await skillService.GetAll();
         Categories = await categoryService.GetAll();
     }
 
     private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)
     {
-        await Task.CompletedTask;
-        var filteredSkills = SelectedCategory != null ? Skills.Where(skill => skill.CategoryId == SelectedCategory.Id).ToList() :
+
+        var filteredSkills = Skill.Category != null ? Skills.Where(skill => skill.CategoryId == Skill.Category.Id).ToList() :
         Skills.ToList();
 
         var skillNames = filteredSkills.Select(skill => skill.Name).ToList();
 
-        return string.IsNullOrEmpty(value) ? skillNames :
-        skillNames.Where(skill => skill.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        var result = string.IsNullOrEmpty(value) ? skillNames :
+        skillNames.Where(skillName => skillName.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        return await Task.FromResult<IEnumerable<string>>(result);
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
     {
         await Task.CompletedTask;
-        return string.IsNullOrEmpty(value) ? Categories :
+        var result = string.IsNullOrEmpty(value) ? Categories :
         Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return await Task.FromResult<IEnumerable<Category>>(result);
     }
-
 }

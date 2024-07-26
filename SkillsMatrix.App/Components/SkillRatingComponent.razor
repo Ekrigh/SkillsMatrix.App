@@ -15,21 +15,13 @@ else
     <div>
         <h5>@UserSkillRating.Skill.Name</h5>
         <label>Current Rating:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
+        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6"/>
         <label>Desired Rating:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6" />
+        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6"/>
     </div>
 }
 
 @code {
     [Parameter]
     public UserSkillRating UserSkillRating { get; set; }
-
-    [Parameter]
-    public EventCallback<UserSkillRating> OnUserSkillRatingChanged { get; set; }
-
-    private async Task OnRatingChanged()
-    {
-        await OnUserSkillRatingChanged.InvokeAsync(UserSkillRating);
-    }
 }

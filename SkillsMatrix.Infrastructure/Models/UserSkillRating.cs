@@ -9,7 +9,7 @@ namespace SkillsMatrix.Infrastructure.Models
         public int SkillId { get; set; }
         public User User { get; set; }
         public Skill Skill { get; set; }
-        public int Rating { get; set; }
-        public int DesiredRating { get; set; }
+        public int Rating { get; set; } = new();
+        public int DesiredRating { get; set; } = new();
     }
 }

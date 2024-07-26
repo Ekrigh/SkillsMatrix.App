@@ -41,7 +41,6 @@
         }
         ErrorMessage = string.Empty;
         if (User is null) return;
-        InitialiseUserSkillRatings(User);
         await userService.Add(User);
     }
 
@@ -50,7 +49,7 @@
         var userToDelete = Users.FirstOrDefault(user => user.Email.Equals(User.Email, StringComparison.InvariantCultureIgnoreCase));
         if (userToDelete == null)
         {
-            ErrorMessage = "The category does not exist";
+            ErrorMessage = "The user does not exist";
             return;
         }
         ErrorMessage = string.Empty;
@@ -63,22 +62,4 @@
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
     }
-
-    private async Task InitialiseUserSkillRatings(User user)
-    {
-        foreach (var skill in Skills)
-        {
-            user.UserSkillRatings.Add(new UserSkillRating
-                {
-                    UserId = user.Id,
-                    SkillId = skill.Id,
-                    Rating = 0,
-                    DesiredRating = 0
-                });
-        }
-    }
-
-
-
-
 }
