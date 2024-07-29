@@ -3,6 +3,7 @@
 @inject ICategoryService categoryService
 @inject IUserService userService
 @inject ISkillService skillService
+@inject ISnackbar Snackbar
 
 <h3>rateSkills</h3>
 
@@ -80,7 +81,7 @@
     {
         foreach (var tempRating in TempUserSkillRatings)
         {
-            var originalRating = UserSkillRatings.FirstOrDefault(r => r.SkillId == tempRating.SkillId);
+            var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempRating.SkillId);
             if (originalRating != null)
             {
                 originalRating.Rating = tempRating.Rating;
@@ -93,6 +94,9 @@
         }
 
         await userSkillRatingService.SaveAll(UserSkillRatings);
+        Snackbar.Add("Ratings saved", Severity.Success, config => {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)

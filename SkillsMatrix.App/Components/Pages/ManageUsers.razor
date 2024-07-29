@@ -1,6 +1,7 @@
 ﻿@page "/manageusers"
-@inject IUserService userService;
+@inject IUserService userService
 @inject ISkillService skillService
+@inject ISnackbar Snackbar
 
 <PageTitle>Manage User</PageTitle>
 
@@ -42,6 +43,10 @@
         ErrorMessage = string.Empty;
         if (User is null) return;
         await userService.Add(User);
+        Snackbar.Add("Successfully added user", Severity.Success, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
     }
 
     private async Task DeleteUser()
@@ -54,6 +59,10 @@
         }
         ErrorMessage = string.Empty;
         await userService.Delete(userToDelete);
+        Snackbar.Add("Successfully removed user", Severity.Info, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
         Users = await userService.GetAll();
     }
 

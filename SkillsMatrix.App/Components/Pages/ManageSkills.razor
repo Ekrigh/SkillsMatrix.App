@@ -1,7 +1,8 @@
 ﻿@page "/manageskills"
-@inject ISkillService skillService;
-@inject ICategoryService categoryService;
-@inject IUserService userService;
+@inject ISkillService skillService
+@inject ICategoryService categoryService
+@inject IUserService userService
+@inject ISnackbar Snackbar
 
 <PageTitle>Manage Skill</PageTitle>
 
@@ -50,6 +51,10 @@
         }
         ErrorMessage = string.Empty;
         await skillService.Add(Skill);
+        Snackbar.Add("Successfully added skill", Severity.Success, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
         Skills = await skillService.GetAll();
         Skill = new Skill();
     }
@@ -64,6 +69,10 @@
         }
         ErrorMessage = string.Empty;
         await skillService.Delete(skillToDelete);
+        Snackbar.Add("Successfully removed skill", Severity.Info, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
         Skills = await skillService.GetAll();
     }
 

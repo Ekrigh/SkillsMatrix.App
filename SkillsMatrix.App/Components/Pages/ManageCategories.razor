@@ -1,5 +1,6 @@
 ﻿@page "/managecategories"
-@inject ICategoryService categoryService;
+@inject ICategoryService categoryService
+@inject ISnackbar Snackbar
 
 <PageTitle>Manage category</PageTitle>
 
@@ -39,6 +40,10 @@
         ErrorMessage = string.Empty;
 
         await categoryService.Add(Category);
+        Snackbar.Add("Successfully added category", Severity.Success, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
         Categories = await categoryService.GetAll();
     }
 
@@ -52,6 +57,10 @@
         }
         ErrorMessage = string.Empty;
         await categoryService.Delete(categoryToDelete);
+        Snackbar.Add("Successfully removed category", Severity.Info, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
         Categories = await categoryService.GetAll();
     }
 
