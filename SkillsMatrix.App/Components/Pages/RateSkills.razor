@@ -81,11 +81,13 @@
     {
         foreach (var tempRating in TempUserSkillRatings)
         {
+            tempRating.LastUpdated = DateTime.Now;
             var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempRating.SkillId);
             if (originalRating != null)
             {
                 originalRating.Rating = tempRating.Rating;
                 originalRating.DesiredRating = tempRating.DesiredRating;
+                originalRating.LastUpdated = tempRating.LastUpdated;
             }
             else
             {
