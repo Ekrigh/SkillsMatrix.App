@@ -17,10 +17,18 @@ else
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" />
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false"/>
             @foreach (var skill in Skills)
-            {
-                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation" />
+            {   
+                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+                    <HeaderTemplate>
+
+                        <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+                            <MudText>@skill.Name</MudText>
+                        </MudTooltip>
+
+                    </HeaderTemplate>
+                </PropertyColumn>
             }
         </Columns>
     </MudDataGrid>
