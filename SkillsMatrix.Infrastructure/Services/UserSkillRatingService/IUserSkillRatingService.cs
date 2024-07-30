@@ -4,11 +4,11 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
 {
     public interface IUserSkillRatingService
     {
-        Task<UserSkillRating> Get(int id);
+        Task<UserSkillRating> GetById(int id);
         Task<UserSkillRating> GetByUserIdAndSkillId(int userId, int skillId);
         Task<List<UserSkillRating>> GetAllByUserId(int id);
         Task<IEnumerable<UserSkillRating>> GetAll();
         Task Add(UserSkillRating userSkillRating);
-        Task SaveAll(List<UserSkillRating> userSkillRatings);
+        Task AddAll(List<UserSkillRating> userSkillRatings);
     }
 }

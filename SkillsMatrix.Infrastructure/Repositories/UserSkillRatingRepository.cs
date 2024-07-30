@@ -17,7 +17,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
             .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
         }
 
-        public async Task SaveAll(List<UserSkillRating> userSkillRatings)
+        public async Task AddAll(List<UserSkillRating> userSkillRatings)
         {
             foreach (var userSkillRating in userSkillRatings)
             {
@@ -36,6 +36,14 @@ namespace SkillsMatrix.Infrastructure.Repositories
                 }
             }
             _smContext.SaveChangesAsync();
+        }
+
+        public new async Task<IEnumerable<UserSkillRating>> GetAll()
+        {
+            return await _smContext.UserSkillRatings
+                         .Include(usr => usr.User)
+                         .Include(usr => usr.Skill)
+                         .ToListAsync();
         }
     }
 }
