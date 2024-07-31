@@ -45,6 +45,7 @@
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
         Categories = await categoryService.GetAll();
+        Category = new();
     }
 
     private async Task DeleteCategory()
@@ -62,6 +63,7 @@
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
         Categories = await categoryService.GetAll();
+        Category = new();
     }
 
     protected override async Task OnInitializedAsync()

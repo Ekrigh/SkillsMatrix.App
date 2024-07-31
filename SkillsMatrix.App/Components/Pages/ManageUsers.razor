@@ -41,12 +41,14 @@
             return;
         }
         ErrorMessage = string.Empty;
-        if (User is null) return;
+
         await userService.Add(User);
         Snackbar.Add("Successfully added user", Severity.Success, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
+        Users = await userService.GetAll();
+        User = new();
     }
 
     private async Task DeleteUser()
@@ -64,6 +66,7 @@
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
         Users = await userService.GetAll();
+        User = new();
     }
 
     protected override async Task OnInitializedAsync()

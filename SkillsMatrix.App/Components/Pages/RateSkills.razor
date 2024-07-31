@@ -34,7 +34,7 @@
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
-    private List<Skill> SkillsByCategory { get; set; } = new();
+    private List<Skill> SkillsByCategory { get; set; }
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
     private List<UserSkillRating> TempUserRatingsForSelectedCategory { get; set; } = new();
     private Category _selectedCategory;

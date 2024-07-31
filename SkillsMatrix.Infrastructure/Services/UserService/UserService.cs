@@ -25,20 +25,21 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
 
         public async Task Add(User user)
         {
-            await _userRepository.Add(user);
             _memoryCache.Remove("users");
+            await _userRepository.Add(user);
         }
 
         public async Task Delete(User user)
         {
-            await _userRepository.Remove(user);
             _memoryCache.Remove("users");
+            await _userRepository.Remove(user);
+            
         }
 
         public async Task Update(User user)
         {
-            await _userRepository.Update(user);
             _memoryCache.Remove("users");
+            await _userRepository.Update(user);
         }
 
         public async Task UpdateAll(IEnumerable<User> users)

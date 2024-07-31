@@ -9,8 +9,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
         {
             return await _smContext.Skills
                          .Include(skill => skill.Category)
-                         .Include(skill => skill.Users)
-                         .Include(skill => skill.UserSkillRatings)
                          .ToListAsync();
         }
     }

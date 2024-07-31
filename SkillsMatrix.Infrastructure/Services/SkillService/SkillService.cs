@@ -24,14 +24,14 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
 
         public async Task Add(Skill skill)
         {
-            await _skillRepository.Add(skill);
             _memoryCache.Remove("skills");
+            await _skillRepository.Add(skill);
         }
 
         public async Task Delete(Skill skill)
         {
-            await _skillRepository.Remove(skill);
             _memoryCache.Remove("skills");
+            await _skillRepository.Remove(skill);
         }
 
 

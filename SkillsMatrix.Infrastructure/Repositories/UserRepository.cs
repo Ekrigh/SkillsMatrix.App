@@ -14,7 +14,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
         public new async Task<IEnumerable<User>> GetAll()
         {
             return await _smContext.Users
-                .Include(user => user.Skills)
                 .Include(user => user.UserSkillRatings)
                 .ToListAsync();
         }
