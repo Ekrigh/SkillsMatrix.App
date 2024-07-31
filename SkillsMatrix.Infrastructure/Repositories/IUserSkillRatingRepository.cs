@@ -6,7 +6,8 @@ namespace SkillsMatrix.Infrastructure.Repositories
     {
         Task<List<UserSkillRating>> GetAllByUserId(int userId);
         UserSkillRating GetByUserIdAndSkillId(int userId, int skillId);
-        Task SaveAll(List<UserSkillRating> userSkillRatings);
+        Task AddAll(List<UserSkillRating> userSkillRatings);
+        Task<IEnumerable<UserSkillRating>> GetAll();
     }
 }
 

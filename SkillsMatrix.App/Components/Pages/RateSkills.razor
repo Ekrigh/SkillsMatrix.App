@@ -34,7 +34,7 @@
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
-    private List<Skill> SkillsByCategory { get; set; } = new();
+    private List<Skill> SkillsByCategory { get; set; }
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
     private List<UserSkillRating> TempUserRatingsForSelectedCategory { get; set; } = new();
     private Category _selectedCategory;
@@ -46,14 +46,14 @@
         {
             if (_selectedCategory == value) return;
             _selectedCategory = value;
-            SkillsByCategory = Skills.Where(skill => skill.Category == _selectedCategory).ToList();
+            SkillsByCategory = Skills.Where(skill => skill.CategoryId == _selectedCategory.Id).ToList();
             TempUserRatingsForSelectedCategory = CreateDeepCopy(UserSkillRatings.Where(usr => SkillsByCategory.Any(skill => skill.Id == usr.SkillId)).ToList());
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await userService.Get(1);
+        currentUser = await userService.GetById(1);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
@@ -94,7 +94,7 @@
             }
         }
        
-        await userSkillRatingService.SaveAll(UserSkillRatings);
+        await userSkillRatingService.AddAll(UserSkillRatings);
         Snackbar.Add("Ratings saved", Severity.Success, config => {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });

@@ -22,7 +22,7 @@ else
             {   
                 <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                     <HeaderTemplate>
-
+                        
                         <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                             <MudText>@skill.Name</MudText>
                         </MudTooltip>

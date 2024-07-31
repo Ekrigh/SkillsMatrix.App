@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 // Add services to the container.
+services.AddMemoryCache();
 services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -26,6 +27,7 @@ services.AddScoped<ICategoryService, CategoryService>();
 services.AddScoped<IUserSkillRatingService, UserSkillRatingService>();
 services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+services.AddScoped(typeof(ISkillRepository) , typeof(SkillRepository));
 services.AddScoped(typeof(IUserSkillRatingRepository), typeof(UserSkillRatingRepository));
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
 services.AddDbContext<SMContext>(options =>
