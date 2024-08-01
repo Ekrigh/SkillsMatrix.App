@@ -10,8 +10,8 @@ namespace SkillsMatrix.Infrastructure.Models
         public string? Description { get; set; }
         public int CategoryId { get; set; }
         [Required]
-        public Category Category { get; set; }
-        public List<User> Users { get; set; } = new();
-        public List<UserSkillRating> UserSkillRatings { get; set; } = new();
+        public virtual Category Category { get; set; }
+        public virtual List<User> Users { get; set; } = new();
+        public virtual List<UserSkillRating> UserSkillRatings { get; set; } = new();
     }
 }
