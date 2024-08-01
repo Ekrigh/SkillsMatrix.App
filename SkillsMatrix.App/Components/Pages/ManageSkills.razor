@@ -18,7 +18,7 @@
             </NoItemsTemplate>
         </MudAutocomplete>
 
-        <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" SearchFuncWithCancel="@SearchSkill" ResetValueOnEmptyText="true" CoerceValue="true" CoerceText="true" Required="true" For="@(() => Skill.Name)">
+        <MudAutocomplete T="string" Label="Enter skill name" MaxItems="null" @bind-Value="Skill.Name" SearchFuncWithCancel="@SearchSkill" ResetValueOnEmptyText="true" CoerceValue="true" CoerceText="false" Required="true" For="@(() => Skill.Name)">
             <NoItemsTemplate>
                 <MudText Align="Align.Center" Class="px-4 py-1">Skill to be added: @Skill.Name</MudText>
             </NoItemsTemplate>

@@ -11,7 +11,7 @@ namespace SkillsMatrix.Infrastructure.Models
         public int CategoryId { get; set; }
         [Required]
         public Category Category { get; set; }
-        public List<User> Users { get; } = new();
-        public List<UserSkillRating> UserSkillRatings { get; } = new();
+        public List<User> Users { get; set; } = new();
+        public List<UserSkillRating> UserSkillRatings { get; set; } = new();
     }
 }

@@ -26,8 +26,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
 
                 if (existingRating != null)
                 {
-                    existingRating.Rating = userSkillRating.Rating;
-                    existingRating.DesiredRating = userSkillRating.DesiredRating;
                     _smContext.UserSkillRatings.Update(existingRating);
                 }
                 else
@@ -35,7 +33,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
                     await _smContext.UserSkillRatings.AddAsync(userSkillRating);
                 }
             }
-            _smContext.SaveChangesAsync();
+           await _smContext.SaveChangesAsync();
         }
 
         public new async Task<IEnumerable<UserSkillRating>> GetAll()

@@ -6,7 +6,6 @@ using SkillsMatrix.Infrastructure.Services.SkillService;
 using SkillsMatrix.Infrastructure.Services.UserService;
 using SkillsMatrix.Infrastructure.Services.UserSkillRatingService;
 using SkillsMatrix.Infrastructure.Services.CategoryService;
-using System.Configuration;
 using MudBlazor.Services;
 using SkillsMatrix.Infrastructure.Services;
 
@@ -17,7 +16,6 @@ var configuration = builder.Configuration;
 services.AddMemoryCache();
 services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
 services.AddMudServices(x =>
 x.PopoverOptions.ThrowOnDuplicateProvider = false);
 services.AddScoped<AppState>();
@@ -30,10 +28,15 @@ services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 services.AddScoped(typeof(ISkillRepository) , typeof(SkillRepository));
 services.AddScoped(typeof(IUserSkillRatingRepository), typeof(UserSkillRatingRepository));
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
+var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
 services.AddDbContext<SMContext>(options =>
 {
-    options.UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion);
+    options
+    .UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion)
+    .UseLoggerFactory(loggerFactory)
+    .UseMemoryCache();
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
