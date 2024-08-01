@@ -37,17 +37,18 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
 
         public async Task Add(UserSkillRating userSkillRating)
         {
-            await _userSkillRatingRepository.Add(userSkillRating);
             _memoryCache.Remove("userSkillRatings");
             _memoryCache.Remove("users");
+            await _userSkillRatingRepository.Add(userSkillRating);
         }
 
         public async Task AddAll(List<UserSkillRating> userSkillRatings)
         {
-            await _userSkillRatingRepository.AddAll(userSkillRatings);
+            _memoryCache.Remove("skills");
+            _memoryCache.Remove("categories");
             _memoryCache.Remove("userSkillRatings");
             _memoryCache.Remove("users");
-
+            await _userSkillRatingRepository.AddAll(userSkillRatings);
         }
     }
 }

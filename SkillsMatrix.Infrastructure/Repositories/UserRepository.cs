@@ -15,6 +15,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
         {
             return await _smContext.Users
                 .Include(user => user.UserSkillRatings)
+                .Include(user => user.Skills)
                 .ToListAsync();
         }
 

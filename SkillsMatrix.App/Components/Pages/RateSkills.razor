@@ -53,7 +53,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await userService.GetById(1);
+        currentUser = await userService.GetById(6);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
