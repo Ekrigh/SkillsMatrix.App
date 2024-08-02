@@ -26,8 +26,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
                 _smContext.ChangeTracker.Clear();
                 if (existingRating != null)
                 {
-                    existingRating.Rating = userSkillRating.Rating;
-                    existingRating.DesiredRating = userSkillRating.DesiredRating;
                     _smContext.UserSkillRatings.Update(existingRating);
                 }
                 else

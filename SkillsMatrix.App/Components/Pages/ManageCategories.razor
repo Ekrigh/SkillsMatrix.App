@@ -7,11 +7,11 @@
 <h3>Manage Category</h3>
 
 <div class="col-md-4">
-    <EditForm Model="@Category" FormName="AddCategory" OnValidSubmit="HandleValidSubmit">
+    <EditForm Model="@Category" FormName="AddEditCategory" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-        <MudAutocomplete T="string" Label="Enter category name" MaxItems="null" @bind-Value="Category.Name" SearchFuncWithCancel="@SearchCategory" CoerceValue="true" CoerceText="true" Required="true" For="@(() => Category.Name)">
+        <MudAutocomplete T="string" Label="Enter category name" MaxItems="null" @bind-Value="Category.Name" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true" CoerceValue="true" CoerceText="false" Required="true" For="@(() => Category.Name)">
             <NoItemsTemplate>
-                <MudText Align="Align.Center" Class="px-4 py-1">Skill to be added: @Category.Name</MudText>
+                <MudText Align="Align.Center" Class="px-4 py-1">Category to be added: @Category.Name</MudText>
             </NoItemsTemplate>
         </MudAutocomplete>
 
@@ -59,6 +59,24 @@
         ErrorMessage = string.Empty;
         await categoryService.Delete(categoryToDelete);
         Snackbar.Add("Successfully removed category", Severity.Info, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
+        Categories = await categoryService.GetAll();
+        Category = new();
+    }
+
+    private async Task EditCategory()
+    {
+        var categoryToEdit = Categories.FirstOrDefault(category => category.Name.Equals(Category.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (categoryToEdit == null)
+        {
+            ErrorMessage = "The category does not exist";
+            return;
+        }
+        ErrorMessage = string.Empty;
+        await categoryService.Update(categoryToEdit);
+        Snackbar.Add("Successfully edited category", Severity.Info, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });

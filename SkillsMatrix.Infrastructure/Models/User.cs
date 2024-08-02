@@ -9,7 +9,7 @@ namespace SkillsMatrix.Infrastructure.Models
         public string Name { get; set; }
         [Required]
         public string Email { get; set; }
-        public List<Skill> Skills { get; } = new();
-        public List<UserSkillRating> UserSkillRatings { get; } = new();
+        public virtual List<Skill> Skills { get; set; } = new();
+        public virtual List<UserSkillRating> UserSkillRatings { get; set; } = new();
     }
 }
