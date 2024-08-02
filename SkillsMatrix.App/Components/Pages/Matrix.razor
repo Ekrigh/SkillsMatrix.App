@@ -10,22 +10,26 @@
 }
 else
 {
-    <MudDataGrid Class="mt-2" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+    <MudDataGrid Class="m-5 rounded-lg" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudFab Class="" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
             <MudFab Class="ml-1" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
-            <MudTextField Class="ml-1 mb-5" @bind-Value="_searchString" Placeholder="Search user" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+            <MudTextField Style="width:320px; align-self: end" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false"/>
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" >
+                <HeaderTemplate>
+                    <MudText><b>User</b></MudText>
+                </HeaderTemplate>
+            </PropertyColumn>
             @foreach (var skill in Skills)
-            {   
-                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _cellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+            {
+                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                     <HeaderTemplate>
-                        
+
                         <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
-                            <MudText>@skill.Name</MudText>
+                            <MudText><b>@skill.Name</b></MudText>
                         </MudTooltip>
 
                     </HeaderTemplate>
@@ -69,7 +73,7 @@ else
         return userSkillRating?.Rating ?? 0;
     }
 
-    private Func<User, Skill, string> _cellStyleFunc => (user, skill) =>
+    private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
         string style = "";
         int? rating = GetUserSkillRating(user, skill);
@@ -77,25 +81,25 @@ else
         switch (rating)
         {
             case 1:
-                style = "background-color:#FF0000";
+                style = "background-color:#E94B41CC; text-align:center";
                 break;
             case 2:
-                style = "background-color:#FFA500";
+                style = "background-color:#F28724CC; text-align:center";
                 break;
             case 3:
-                style = "background-color:#FFFF00";
+                style = "background-color:#F2C024CC; text-align:center";
                 break;
             case 4:
-                style = "background-color:#66CDAA";
+                style = "background-color:#D1E329CC; text-align:center";
                 break;
             case 5:
-                style = "background-color:#90EE90";
+                style = "background-color:#9CD751CC; text-align:center";
                 break;
             case 6:
-                style = "background-color:#32CD32; font-weight:bold";
+                style = "background-color:#75C13CCC; text-align:center";
                 break;
             default:
-                style = "background-color:#FFFFFF";
+                style = "background-color:#FCFCFC; text-align:center";
                 break;
         }
         return style;
