@@ -8,13 +8,17 @@ namespace SkillsMatrix.Infrastructure.Repositories
         public async Task<List<UserSkillRating>> GetAllByUserId(int userId)
         {
             return await _smContext.UserSkillRatings.Where(usr => usr.UserId == userId)
-            .ToListAsync();
+                .Include(usr => usr.User)
+                .Include(usr => usr.Skill)
+                .ToListAsync();
         }
 
         public UserSkillRating GetByUserIdAndSkillId(int userId, int skillId)
         {
             return _smContext.UserSkillRatings
-            .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
+                 .Include(usr => usr.User)
+                 .Include(usr => usr.Skill)
+                .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
         }
 
         public async Task AddAll(List<UserSkillRating> userSkillRatings)
@@ -23,7 +27,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
             {
                 var existingRating = await _smContext.UserSkillRatings
                     .FirstOrDefaultAsync(usr => usr.UserId == userSkillRating.UserId && usr.SkillId == userSkillRating.SkillId);
-                _smContext.ChangeTracker.Clear();
                 if (existingRating != null)
                 {
                     _smContext.UserSkillRatings.Update(existingRating);

@@ -1,6 +1,5 @@
 ﻿@page "/manageusers"
 @inject IUserService userService
-@inject ISkillService skillService
 @inject ISnackbar Snackbar
 
 <PageTitle>Manage User</PageTitle>
@@ -30,7 +29,6 @@
 {
     private User User { get; set; } = new();
     private IEnumerable<User> Users { get; set; }
-    private IEnumerable<Skill> Skills { get; set; }
     private string ErrorMessage;
 
     private async Task HandleValidSubmit()
@@ -74,14 +72,5 @@
     protected override async Task OnInitializedAsync()
     {
         Users = await userService.GetAll();
-        Skills = await skillService.GetAll();
-
-        // var usersTask = userService.GetAll();
-        // var skillsTask = skillService.GetAll();
-        
-        // await Task.WhenAll(usersTask, skillsTask);
-
-        // Users = usersTask.Result;
-        // Skills = skillsTask.Result;
     }
 }

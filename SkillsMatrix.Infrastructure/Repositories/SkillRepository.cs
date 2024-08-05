@@ -7,10 +7,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
     {
         public new async Task<IEnumerable<Skill>> GetAll()
         {
-            return await _smContext.Skills
-                         .Include(skill => skill.Category)
-                         .Include(skill => skill.Users)
-                         .ToListAsync();
+            return await _smContext.Skills.ToListAsync();
         }
     }
 }

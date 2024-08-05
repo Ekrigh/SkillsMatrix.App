@@ -8,18 +8,12 @@ namespace SkillsMatrix.Infrastructure.Repositories
     {
         public new async Task<User> GetById(int id)
         {
-            return await _smContext.Users
-                .Include(user => user.UserSkillRatings)
-                .ThenInclude(usr => usr.Skill)
-                .FirstOrDefaultAsync(user => user.Id == id);
+            return await _smContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
         public new async Task<IEnumerable<User>> GetAll()
         {
-            return await _smContext.Users
-                .Include(user => user.UserSkillRatings)
-                .Include(user => user.Skills)
-                .ToListAsync();
+            return await _smContext.Users.ToListAsync();
         }
 
     }

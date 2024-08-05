@@ -33,9 +33,7 @@ services.AddDbContext<SMContext>(options =>
 {
     options
     .UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion)
-    .UseLoggerFactory(loggerFactory)
-    .UseLazyLoadingProxies();
-    
+    .UseLoggerFactory(loggerFactory);
 });
 
 var app = builder.Build();

@@ -1,7 +1,6 @@
 ﻿@page "/manageskills"
 @inject ISkillService skillService
 @inject ICategoryService categoryService
-@inject IUserService userService
 @inject ISnackbar Snackbar
 
 <PageTitle>Manage Skill</PageTitle>
@@ -38,7 +37,6 @@
 {
     private Skill Skill { get; set; } = new();
     private IEnumerable<Skill> Skills { get; set; }
-    private IEnumerable<User> Users { get; set; }
     private IEnumerable<Category> Categories { get; set; }
     private string ErrorMessage { get; set; }
 
@@ -81,19 +79,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Users = await userService.GetAll();
         Skills = await skillService.GetAll();
         Categories = await categoryService.GetAll();
-
-        // var usersTask = userService.GetAll();
-        // var skillsTask = skillService.GetAll();
-        // var categoriesTask = categoryService.GetAll();
-
-        // await Task.WhenAll(usersTask, skillsTask, categoriesTask);
-
-        // Users = usersTask.Result;
-        // Skills = skillsTask.Result;
-        // Categories = categoriesTask.Result;
     }
 
     private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)

@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IUserService userService
 @inject ISkillService skillService
+@inject IUserSkillRatingService userSkillRatingService
 
 @if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
 {
@@ -37,8 +38,9 @@ else
 
 @code {
 
-    private IEnumerable<User> Users { get; set; } = new List<User>();
+    private IEnumerable<User> Users { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
+    private IEnumerable<UserSkillRating> UserSkillRatings { get; set; }
     private MudDataGrid<User> matrixGrid;
     private string _searchString;
     private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
@@ -58,19 +60,12 @@ else
     {
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
-
-        // var usersTask = userService.GetAll();
-        // var skillsTask = skillService.GetAll();
-
-        // await Task.WhenAll(usersTask, skillsTask);
-
-        // Users = usersTask.Result;
-        // Skills = skillsTask.Result;
+        UserSkillRatings = await userSkillRatingService.GetAll();
     }
-
     private int GetUserSkillRating(User user, Skill skill)
     {
-        var userSkillRating = user.UserSkillRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
+        .FirstOrDefault(usr => usr.SkillId == skill.Id);
         return userSkillRating?.Rating ?? 0;
     }
 

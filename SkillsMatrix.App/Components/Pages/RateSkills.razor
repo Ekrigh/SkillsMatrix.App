@@ -13,7 +13,6 @@
         </NoItemsTemplate>
     </MudAutocomplete>
 
-
     @if (SelectedCategory != null)
     {
         <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit" class="mt-5">
@@ -51,21 +50,9 @@
     protected override async Task OnInitializedAsync()
     {
         currentUser = await userService.GetById(6);
+        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
-        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
-
-        // var currentUserTask = userService.GetById(6);
-        // var categoriesTask = categoryService.GetAll();
-        // var skillsTask = skillService.GetAll();
-        // var userSkillRatingsTask = userSkillRatingService.GetAllByUserId(currentUser.Id);
-
-        // await Task.WhenAll(currentUserTask, categoriesTask, skillsTask, userSkillRatingsTask);
-
-        // currentUser = currentUserTask.Result;
-        // Categories = categoriesTask.Result;
-        // Skills = skillsTask.Result;
-        // UserSkillRatings = userSkillRatingsTask.Result;
     }
 
     private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
