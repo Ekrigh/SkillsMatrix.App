@@ -51,11 +51,12 @@
         }
         ErrorMessage = string.Empty;
         await skillService.Add(Skill);
+        Skills = Skills.Append(Skill);
         Snackbar.Add("Successfully added skill", Severity.Success, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        Skills = await skillService.GetAll();
+
         Skill = new();
     }
 
@@ -69,11 +70,12 @@
         }
         ErrorMessage = string.Empty;
         await skillService.Delete(skillToDelete);
+        Skills = Skills.Where(s => s.Id != Skill.Id);
         Snackbar.Add("Successfully removed skill", Severity.Info, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        Skills = await skillService.GetAll();
+
         Skill = new();
     }
 
@@ -82,6 +84,16 @@
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
         Categories = await categoryService.GetAll();
+
+        // var usersTask = userService.GetAll();
+        // var skillsTask = skillService.GetAll();
+        // var categoriesTask = categoryService.GetAll();
+
+        // await Task.WhenAll(usersTask, skillsTask, categoriesTask);
+
+        // Users = usersTask.Result;
+        // Skills = skillsTask.Result;
+        // Categories = categoriesTask.Result;
     }
 
     private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)

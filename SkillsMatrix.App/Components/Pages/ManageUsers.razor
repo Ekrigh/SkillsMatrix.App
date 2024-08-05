@@ -62,11 +62,12 @@
         }
         ErrorMessage = string.Empty;
         await userService.Delete(userToDelete);
+        Users = Users.Where(u => u.Id != User.Id);
         Snackbar.Add("Successfully removed user", Severity.Info, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        Users = await userService.GetAll();
+
         User = new();
     }
 
@@ -74,5 +75,13 @@
     {
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
+
+        // var usersTask = userService.GetAll();
+        // var skillsTask = skillService.GetAll();
+        
+        // await Task.WhenAll(usersTask, skillsTask);
+
+        // Users = usersTask.Result;
+        // Skills = skillsTask.Result;
     }
 }

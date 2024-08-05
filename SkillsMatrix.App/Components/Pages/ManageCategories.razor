@@ -41,11 +41,12 @@
         ErrorMessage = string.Empty;
 
         await categoryService.Add(Category);
+        Categories = Categories.Append(Category);
         Snackbar.Add("Successfully added category", Severity.Success, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        Categories = await categoryService.GetAll();
+        
         Category = new();
     }
 
@@ -59,11 +60,12 @@
         }
         ErrorMessage = string.Empty;
         await categoryService.Delete(categoryToDelete);
+        Categories = Categories.Where(c => c.Id != Category.Id);
         Snackbar.Add("Successfully removed category", Severity.Info, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        Categories = await categoryService.GetAll();
+    
         Category = new();
     }
 

@@ -7,24 +7,24 @@
 
 <div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029;">
     <h3>Rate Skills</h3>
-        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
-            <NoItemsTemplate>
-                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
-            </NoItemsTemplate>
-        </MudAutocomplete>
+    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+        <NoItemsTemplate>
+            <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+        </NoItemsTemplate>
+    </MudAutocomplete>
 
 
-@if (SelectedCategory != null)
-{
-    <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit" class="mt-5">
-        @foreach (var skill in SkillsByCategory)
-        {
-            var userSkillRating = GetTempUserSkillRatingForSkill(skill);
-            <SkillRatingComponent UserSkillRating="userSkillRating" />
-        }
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
-    </EditForm>
-}
+    @if (SelectedCategory != null)
+    {
+        <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit" class="mt-5">
+            @foreach (var skill in SkillsByCategory)
+            {
+                var userSkillRating = GetTempUserSkillRatingForSkill(skill);
+                <SkillRatingComponent UserSkillRating="userSkillRating" />
+            }
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
+        </EditForm>
+    }
 </div>
 @code
 {
@@ -54,6 +54,18 @@
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
+
+        // var currentUserTask = userService.GetById(6);
+        // var categoriesTask = categoryService.GetAll();
+        // var skillsTask = skillService.GetAll();
+        // var userSkillRatingsTask = userSkillRatingService.GetAllByUserId(currentUser.Id);
+
+        // await Task.WhenAll(currentUserTask, categoriesTask, skillsTask, userSkillRatingsTask);
+
+        // currentUser = currentUserTask.Result;
+        // Categories = categoriesTask.Result;
+        // Skills = skillsTask.Result;
+        // UserSkillRatings = userSkillRatingsTask.Result;
     }
 
     private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
@@ -90,9 +102,10 @@
                 UserSkillRatings.Add(tempUserSkillRating);
             }
         }
-       
+
         await userSkillRatingService.AddAll(UserSkillRatings);
-        Snackbar.Add("Ratings saved", Severity.Success, config => {
+        Snackbar.Add("Ratings saved", Severity.Success, config =>
+        {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
     }
