@@ -18,7 +18,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
             return _smContext.UserSkillRatings
                  .Include(usr => usr.User)
                  .Include(usr => usr.Skill)
-                .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
+                 .FirstOrDefault(usr => usr.UserId == userId && usr.SkillId == skillId);
         }
 
         public async Task AddAll(List<UserSkillRating> userSkillRatings)
