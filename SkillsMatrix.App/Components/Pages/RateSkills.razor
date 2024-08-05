@@ -5,16 +5,13 @@
 @inject ISkillService skillService
 @inject ISnackbar Snackbar
 
-<h3>rateSkills</h3>
-
-<div class="row">
-    <div class="col-md-4">
+<div class="p-5 m-5 rounded-lg" Style="box-shadow: 0px 3px 6px 0px #20202029;">
+    <h3>Rate Skills</h3>
         <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
             <NoItemsTemplate>
                 <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
             </NoItemsTemplate>
         </MudAutocomplete>
-    </div>
 </div>
 
 @if (SelectedCategory != null)

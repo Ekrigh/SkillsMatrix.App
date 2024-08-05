@@ -17,12 +17,10 @@ else
             <MudTextField Style="width:320px; align-self: end" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
         </ToolBarContent>
+        
         <Columns>
-            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" >
-                <HeaderTemplate>
-                    <MudText><b>User</b></MudText>
-                </HeaderTemplate>
-            </PropertyColumn>
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" />
+            
             @foreach (var skill in Skills)
             {
                 <PropertyColumn Property="user => GetUserSkillRating(user, skill)" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
@@ -103,6 +101,12 @@ else
                 break;
         }
         return style;
+    };
+
+    private Func<User, string> _userCellStyleFunc => (user) =>
+    {
+    string style = "box-shadow: 0px 3px 6px 0px #20202029;";
+    return style;
     };
 
     private async void ClearFilters()
