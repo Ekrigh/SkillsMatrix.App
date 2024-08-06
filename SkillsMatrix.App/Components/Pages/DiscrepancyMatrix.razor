@@ -1,0 +1,196 @@
+﻿@page "/discrepancymatrix"
+@inject IUserService userService
+@inject ISkillService skillService
+@inject IUserSkillRatingService userSkillRatingService
+
+@if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
+{
+    <p>Loading...</p>
+}
+else
+{
+    <MudDataGrid Class="m-5 rounded-lg w-75" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+        <ToolBarContent>
+            <MudFab Class="" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
+            <MudFab Class="ml-1" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
+            <MudTextField Style="width:320px; align-self: end" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
+        </ToolBarContent>
+
+        <Columns>
+            <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" />
+
+            @foreach (var skill in Skills)
+            {
+                @* <PropertyColumn Property="user => GetRating(user, skill)" Title="" @skill.Name" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
+        <HeaderTemplate>
+        <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+        <MudText><b>@skill.Name</b></MudText>
+        </MudTooltip>
+        </HeaderTemplate>
+        <CellTemplate>
+        @{
+        var rating = GetRating(context.Item, skill);
+        }
+        <MudTooltip Text="rating" Arrow="true" Placement="Placement.Top">
+        <MudText><strong>@rating</strong></MudText>
+        </MudTooltip>
+        </CellTemplate>
+        </PropertyColumn> *@
+                var titleString = $"{skill.Name} Rating";
+                <TemplateColumn Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
+                    <HeaderTemplate>
+                        <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+                            <MudText><b>@skill.Name</b></MudText>
+                        </MudTooltip>
+                    </HeaderTemplate>
+                    <CellTemplate>
+                        <MudTooltip Text="Rating" Arrow="true" Placement="Placement.Top">
+                            <MudText><strong>@GetRating(context.Item, skill)</strong></MudText>
+                        </MudTooltip>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                @*  <PropertyColumn Property="user => GetDesiredRating(user, skill)" Title="" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+        <CellTemplate>
+        @{
+        var desiredRating = GetDesiredRating(context.Item, skill);
+        }
+        <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
+        <MudText><strong>@desiredRating</strong></MudText>
+        </MudTooltip>
+        </CellTemplate>
+        </PropertyColumn> *@
+                titleString = $"{skill.Name} Desired Rating";
+                <TemplateColumn Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+                    <HeaderTemplate/>
+                    <CellTemplate>
+                        <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
+                            <MudText><strong>@GetDesiredRating(context.Item, skill)</strong></MudText>
+                        </MudTooltip>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                titleString = $"{skill.Name} Difference";
+                <PropertyColumn Property="user => GetDifference(user, skill)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_differenceAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
+                    <HeaderTemplate/>
+                    <CellTemplate>
+                        @{
+                            var difference = GetDifference(context.Item, skill);
+                        }
+                        <MudTooltip Text="Difference" Arrow="true" Placement="Placement.Top">
+                            <MudText><strong>@difference</strong></MudText>
+                        </MudTooltip>
+                    </CellTemplate>
+                </PropertyColumn>
+
+                @* <TemplateColumn Title="" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="true" AggregateDefinition="_differenceAggregation">
+        <CellTemplate>
+        <MudTooltip Text="Difference" Arrow="true" Placement="Placement.Top">
+        <MudText><strong>@GetDifference(context.Item, skill)</strong></MudText>
+        </MudTooltip>
+        </CellTemplate>
+        </TemplateColumn> *@
+            }
+        </Columns>
+    </MudDataGrid>
+}
+
+@code {
+
+    private IEnumerable<User> Users { get; set; }
+    private IEnumerable<Skill> Skills { get; set; }
+    private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
+    private MudDataGrid<User> matrixGrid;
+    private string _searchString;
+    private AggregateDefinition<User> _differenceAggregation = new AggregateDefinition<User>
+        {
+            Type = AggregateType.Avg,
+            DisplayFormat = "Avg: {value}"
+        };
+
+    private Func<User, bool> _quickFilter => user =>
+      {
+          if (string.IsNullOrWhiteSpace(_searchString)) return true;
+          if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+          return false;
+      };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await userService.GetAll();
+        Skills = await skillService.GetAll();
+        UserSkillRatings = await userSkillRatingService.GetAll();
+    }
+
+    private int GetDifference(User user, Skill skill)
+    {
+        var rating = GetRating(user, skill);
+        var desiredRating = GetDesiredRating(user, skill);
+        return rating - desiredRating;
+    }
+
+    private int GetRating(User user, Skill skill)
+    {
+        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
+        .FirstOrDefault(usr => usr.SkillId == skill.Id);
+        return userSkillRating?.Rating ?? 0;
+    }
+
+    private int GetDesiredRating(User user, Skill skill)
+    {
+        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
+        .FirstOrDefault(usr => usr.SkillId == skill.Id);
+        return userSkillRating?.DesiredRating ?? 0;
+    }
+
+    private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
+    {
+        string style = "text-align:center; font-weight:bold";
+        int? ratingDiff = GetRating(user, skill) - GetDesiredRating(user, skill);
+
+        switch (ratingDiff)
+        {
+            case -5:
+                style = "background-color:#E94B41CC; text-align:center";
+                break;
+            case -4:
+                style = "background-color:#F28724CC; text-align:center";
+                break;
+            case -3:
+                style = "background-color:#F2C024CC; text-align:center";
+                break;
+            case -2:
+                style = "background-color:#D1E329CC; text-align:center";
+                break;
+            case -1:
+                style = "background-color:#9CD751CC; text-align:center";
+                break;
+            case 0:
+                style = "background-color:#75C13CCC; text-align:center";
+                break;
+            default:
+                style = "background-color:#FCFCFC; text-align:center";
+                break;
+        }
+        style += ";font-weight:bold;text-align:center";
+        return style;
+    };
+
+    private async void ClearFilters()
+    {
+        matrixGrid.ClearFiltersAsync();
+
+        foreach (var column in matrixGrid.RenderedColumns)
+        {
+            await column.ShowAsync();
+        }
+    }
+
+    private void ShowColumnsMenu()
+    {
+        matrixGrid.ShowColumnsPanel();
+    }
+
+
+}

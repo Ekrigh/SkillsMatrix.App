@@ -17,4 +17,12 @@
     <ProjectReference Include="..\SkillsMatrix.Server\SkillsMatrix.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\DiscrepancyMatrix.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\DiscrepancyMatrix.razor" />
+  </ItemGroup>
+
 </Project>

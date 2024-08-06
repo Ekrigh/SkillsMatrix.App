@@ -22,7 +22,7 @@ else
             
             @foreach (var skill in Skills)
             {
-                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                     <HeaderTemplate>
 
                         <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
@@ -30,6 +30,7 @@ else
                         </MudTooltip>
 
                     </HeaderTemplate>
+                    
                 </PropertyColumn>
             }
         </Columns>
@@ -99,13 +100,8 @@ else
                 style = "background-color:#FCFCFC; text-align:center";
                 break;
         }
+        style += ";font-weight:bold";
         return style;
-    };
-
-    private Func<User, string> _userCellStyleFunc => (user) =>
-    {
-    string style = "box-shadow: 0px 3px 6px 0px #20202029;";
-    return style;
     };
 
     private async void ClearFilters()
