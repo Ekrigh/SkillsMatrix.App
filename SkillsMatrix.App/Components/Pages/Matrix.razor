@@ -58,12 +58,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAll();
-        
     }
+
     private int GetUserSkillRating(User user, Skill skill)
     {
         var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
