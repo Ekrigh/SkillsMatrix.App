@@ -33,7 +33,8 @@ services.AddDbContext<SMContext>(options =>
 {
     options
     .UseMySql(configuration.GetConnectionString("SkillsMatrixDb"), serverVersion)
-    .UseLoggerFactory(loggerFactory);
+    .UseLoggerFactory(loggerFactory)
+    .EnableSensitiveDataLogging();
 });
 
 var app = builder.Build();

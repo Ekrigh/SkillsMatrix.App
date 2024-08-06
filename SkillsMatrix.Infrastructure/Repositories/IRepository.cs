@@ -8,5 +8,6 @@
         Task Update(T entity);
         Task UpdateAll(IEnumerable<T> entities);
         Task Remove(T entity);
+        void AttachEntities(IEnumerable<T> entities);
     }
 }

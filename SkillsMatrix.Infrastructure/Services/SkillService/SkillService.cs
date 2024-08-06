@@ -38,33 +38,51 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
 }
 
 //public class SkillService(ISkillRepository _skillRepository, IMemoryCache _memoryCache) : ISkillService
+//{
+//    public async Task<Skill> GetById(int id)
 //    {
-//        public async Task<Skill> GetById(int id)
-//        {
-//            var skills = await GetAll();
-//            return skills.FirstOrDefault(skill => skill.Id == id);
-//        }
+//        var skills = await GetAll();
+//        return skills.FirstOrDefault(skill => skill.Id == id);
+//    }
 
-//        public async Task<IEnumerable<Skill>> GetAll()
+//    //public async Task<IEnumerable<Skill>> GetAll()
+//    //{
+//    //    var skills = await _memoryCache.GetOrCreateAsync("skills", async entry =>
+//    //    {
+//    //        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+//    //        return await _skillRepository.GetAll();
+//    //    });
+//    //        _skillRepository.AttachEntities(skills);
+//    //        return skills;
+//    //}
+//    public async Task<IEnumerable<Skill>> GetAll()
+//    {
+//        if (_memoryCache.TryGetValue("skills", out IEnumerable<Skill> skills))
 //        {
-//            var skills = await _memoryCache.GetOrCreateAsync("skills", async entry =>
-//            {
-//                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
-//                return await _skillRepository.GetAll();
-//            });
+//            _skillRepository.AttachEntities(skills);
 //            return skills;
 //        }
 
-//        public async Task Add(Skill skill)
-//        {
-//            _memoryCache.Remove("skills");
-//            await _skillRepository.Add(skill);
-//        }
+//        skills = await _skillRepository.GetAll();
 
-//        public async Task Delete(Skill skill)
+//        _memoryCache.Set("skills", skills, new MemoryCacheEntryOptions
 //        {
-//            _memoryCache.Remove("skills");
-//            await _skillRepository.Remove(skill);
-//        }
+//            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+//        });
+
+//        return skills;
 //    }
+
+//    public async Task Add(Skill skill)
+//    {
+//        _memoryCache.Remove("skills");
+//        await _skillRepository.Add(skill);
+//    }
+
+//    public async Task Delete(Skill skill)
+//    {
+//        _memoryCache.Remove("skills");
+//        await _skillRepository.Remove(skill);
+//    }
+//}
 //}

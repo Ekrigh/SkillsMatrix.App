@@ -27,16 +27,12 @@ namespace SkillsMatrix.Infrastructure.Repositories
             {
                 var existingRating = await _smContext.UserSkillRatings
                     .FirstOrDefaultAsync(usr => usr.UserId == userSkillRating.UserId && usr.SkillId == userSkillRating.SkillId);
-                if (existingRating != null)
+                if (existingRating == null)
                 {
-                    _smContext.UserSkillRatings.Update(existingRating);
-                }
-                else
-                {   
                     await _smContext.UserSkillRatings.AddAsync(userSkillRating);
                 }
             }
-           await _smContext.SaveChangesAsync();
+            await _smContext.SaveChangesAsync();
         }
 
         public new async Task<IEnumerable<UserSkillRating>> GetAll()

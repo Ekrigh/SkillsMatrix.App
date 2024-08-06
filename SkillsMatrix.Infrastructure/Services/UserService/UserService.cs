@@ -54,39 +54,57 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
 //        return users.FirstOrDefault(user => user.Id == id);
 //    }
 
-//    public async Task<IEnumerable<User>> GetAll()
-//    {
-//        var users = await _memoryCache.GetOrCreateAsync("users", async entry =>
+//        //public async Task<IEnumerable<User>> GetAll()
+//        //{
+//        //    var users = await _memoryCache.GetOrCreateAsync("users", async entry =>
+//        //    {
+//        //        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+//        //        return await _userRepository.GetAll();
+//        //    });
+//        //        _userRepository.AttachEntities(users);
+//        //        return users;
+//        //}
+//        public async Task<IEnumerable<User>> GetAll()
 //        {
-//            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
-//            return await _userRepository.GetAll();
-//        });
-//        return users;
-//    }
+//            if (_memoryCache.TryGetValue("users", out IEnumerable<User> users))
+//            {
+//                _userRepository.AttachEntities(users);
+//                return users;
+//            }
 
-//    public async Task Add(User user)
-//    {
-//        _memoryCache.Remove("users");
-//        await _userRepository.Add(user);
-//    }
+//            users = await _userRepository.GetAll();
 
-//    public async Task Delete(User user)
-//    {
-//        _memoryCache.Remove("users");
-//        await _userRepository.Remove(user);
+//            _memoryCache.Set("users", users, new MemoryCacheEntryOptions
+//            {
+//                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+//            });
 
-//    }
+//            return users;
+//        }
 
-//    public async Task Update(User user)
-//    {
-//        _memoryCache.Remove("users");
-//        await _userRepository.Update(user);
-//    }
+//        public async Task Add(User user)
+//        {
+//            _memoryCache.Remove("users");
+//            await _userRepository.Add(user);
+//        }
 
-//    public async Task UpdateAll(IEnumerable<User> users)
-//    {
-//        _memoryCache.Remove("users");
-//        await _userRepository.UpdateAll(users);
+//        public async Task Delete(User user)
+//        {
+//            _memoryCache.Remove("users");
+//            await _userRepository.Remove(user);
+
+//        }
+
+//        public async Task Update(User user)
+//        {
+//            _memoryCache.Remove("users");
+//            await _userRepository.Update(user);
+//        }
+
+//        public async Task UpdateAll(IEnumerable<User> users)
+//        {
+//            _memoryCache.Remove("users");
+//            await _userRepository.UpdateAll(users);
+//        }
 //    }
-//}
 //}

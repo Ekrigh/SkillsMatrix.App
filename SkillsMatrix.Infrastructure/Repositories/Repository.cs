@@ -43,5 +43,16 @@ namespace SkillsMatrix.Infrastructure.Repositories
             await _smContext.SaveChangesAsync();
 
         }
+        public void AttachEntities(IEnumerable<T> entities)
+        {
+            if (entities != null)
+            {
+                foreach (var entity in entities)
+                {
+                        _smContext.Attach(entity);
+                        _smContext.Entry(entity).State = EntityState.Unchanged;
+                }
+            }
+        }
     }
 }

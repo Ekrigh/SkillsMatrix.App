@@ -5,6 +5,7 @@
 @inject ISkillService skillService
 @inject ISnackbar Snackbar
 
+
 <div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029;">
     <h3>Rate Skills</h3>
     <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
@@ -49,7 +50,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await userService.GetById(6);
+
+        currentUser = await userService.GetById(12);
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();

@@ -40,7 +40,7 @@ else
 
     private IEnumerable<User> Users { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
-    private IEnumerable<UserSkillRating> UserSkillRatings { get; set; }
+    private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
     private MudDataGrid<User> matrixGrid;
     private string _searchString;
     private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
@@ -58,9 +58,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        UserSkillRatings = await userSkillRatingService.GetAll();
+        
         Users = await userService.GetAll();
         Skills = await skillService.GetAll();
+        UserSkillRatings = await userSkillRatingService.GetAll();
         
     }
     private int GetUserSkillRating(User user, Skill skill)
