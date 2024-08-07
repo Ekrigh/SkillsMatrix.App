@@ -8,15 +8,15 @@
     <h3>Manage User</h3>
     <EditForm Model="@User" FormName="AddUser" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
-            <label for="Name" class="form-label">Name:</label>
-            <InputText id="Name" @bind-Value="User.Name" class="form-control" />
-            <ValidationMessage For="() => User.Name" />
-            <label for="Email" class="form-label">E-mail:</label>
-            <InputText id="Email" @bind-Value="User.Email" class="form-control" />
-            <ValidationMessage For="() => User.Email" />
+        <label for="Name" class="form-label">Name:</label>
+        <InputText id="Name" @bind-Value="User.Name" class="form-control" />
+        <ValidationMessage For="() => User.Name" />
+        <label for="Email" class="form-label">E-mail:</label>
+        <InputText id="Email" @bind-Value="User.Email" class="form-control" />
+        <ValidationMessage For="() => User.Email" />
         <div class="mt-5">
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
-        <MudButton @onclick="DeleteUser">Delete</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
+            <MudButton @onclick="DeleteUser">Delete</MudButton>
         </div>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -30,6 +30,11 @@
     private User User { get; set; } = new();
     private IEnumerable<User> Users { get; set; }
     private string ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await userService.GetAll();
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -46,7 +51,7 @@
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        
+
         User = new();
     }
 
@@ -67,10 +72,5 @@
         });
 
         User = new();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Users = await userService.GetAll();
     }
 }

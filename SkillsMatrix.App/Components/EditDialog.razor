@@ -1,0 +1,70 @@
+﻿@typeparam TModel
+@inject ICategoryService categoryService
+@inject ISnackbar snackbar
+
+<MudDialog ClassActions="justify-start ml-3" Class="p-4">
+    <DialogContent>
+        @if (Model != null)
+        {
+            @switch (Model)
+            {
+                case Skill skill:
+                    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="skill.Category"
+                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory"
+                                     ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true" Required="true" For="@(() => skill.Category)">
+
+                        <NoItemsTemplate>
+                            <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                            <MudLink Href="managecategories"><MudButton>Create new Category</MudButton></MudLink>
+                        </NoItemsTemplate>
+                    </MudAutocomplete>
+                    <MudTextField @bind-Value="skill.Name" Label="Skill Name" />
+                    break;
+                case Category category:
+                    <MudTextField @bind-Value="category.Name" Label="New category name:" />
+                    break;
+                case User user:
+                    <MudTextField @bind-Value="user.Name" Label="Name" />
+                    <MudTextField @bind-Value="user.Email" Label="Email" />
+                    break;
+                default:
+                    <MudText>Unknown model type</MudText>
+                    break;
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public TModel Model { get; set; }
+
+    [Parameter]
+    public IEnumerable<Category> Categories { get; set; }
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit()
+    {
+        snackbar.Add("Edit Successful", Severity.Info, config =>
+        {
+            snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
+        MudDialog.Close(DialogResult.Ok(Model));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
+    {
+        await Task.CompletedTask;
+        var result = string.IsNullOrEmpty(value) ? Categories :
+        Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return await Task.FromResult<IEnumerable<Category>>(result);
+    }
+}

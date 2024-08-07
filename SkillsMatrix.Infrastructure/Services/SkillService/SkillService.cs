@@ -34,6 +34,11 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
         {
             await _skillRepository.Remove(skill);
         }
+
+        public async Task Update(Skill skill)
+        {
+            await _skillRepository.Update(skill);
+        }
     }
 }
 

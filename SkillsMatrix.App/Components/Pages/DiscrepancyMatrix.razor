@@ -30,7 +30,7 @@ else
                 <FooterTemplate>
                     <MudText Class="sticky-footer"><strong>Average:</strong></MudText>
                 </FooterTemplate>
-                </PropertyColumn>
+            </PropertyColumn>
 
             @foreach (var skill in Skills)
             {
@@ -75,7 +75,7 @@ else
         </PropertyColumn> *@
                 titleString = $"{skill.Name} Desired Rating";
                 <TemplateColumn Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
-                    <HeaderTemplate/>
+                    <HeaderTemplate />
                     <CellTemplate>
                         <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
                             <MudText><strong>@GetDesiredRating(context.Item, skill)</strong></MudText>
@@ -85,7 +85,7 @@ else
 
                 titleString = $"{skill.Name} Discrepancy";
                 <PropertyColumn Property="user => GetDiscrepancy(user, skill)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
-                    <HeaderTemplate/>
+                    <HeaderTemplate />
                     <CellTemplate>
                         @{
                             var Discrepancy = GetDiscrepancy(context.Item, skill);
@@ -203,6 +203,4 @@ else
     {
         matrixGrid.ShowColumnsPanel();
     }
-
-
 }

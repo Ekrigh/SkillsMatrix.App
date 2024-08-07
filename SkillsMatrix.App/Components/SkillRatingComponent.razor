@@ -1,12 +1,4 @@
-﻿@rendermode InteractiveServer
-@using SkillsMatrix.Infrastructure.Models
-@using SkillsMatrix.Infrastructure.Services.UserSkillRatingService
-@using SkillsMatrix.Infrastructure.Services.UserService
-@inject IUserSkillRatingService UserSkillRatingService
-@inject IUserSkillRatingService UserService
-
-
-@if (UserSkillRating == null)
+﻿@if (UserSkillRating == null)
 {
     <p>Loading...</p>
 }
@@ -15,9 +7,9 @@ else
     <div>
         <h5>@UserSkillRating.Skill.Name</h5>
         <label>Current:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6"/>
+        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
         <label>Ambition:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6"/>
+        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6" />
     </div>
 }
 

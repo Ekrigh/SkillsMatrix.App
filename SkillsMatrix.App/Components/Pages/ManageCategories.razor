@@ -1,6 +1,7 @@
 ﻿@page "/managecategories"
 @inject ICategoryService categoryService
-@inject ISnackbar Snackbar
+@inject ISnackbar snackbar
+@inject IDialogService dialogService
 
 <PageTitle>Manage category</PageTitle>
 
@@ -15,8 +16,9 @@
         </MudAutocomplete>
 
         <div class="mt-5">
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
-        <MudButton @onclick="DeleteCategory">Delete</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+            <MudButton @onclick="DeleteCategory">Delete</MudButton>
+            <MudButton @onclick="EditCategory">Edit</MudButton>
         </div>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -30,6 +32,12 @@
     private Category Category { get; set; } = new();
     private IEnumerable<Category> Categories { get; set; }
     private string ErrorMessage { get; set; }
+    private MudDialogInstance editDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await categoryService.GetAll();
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -42,11 +50,11 @@
 
         await categoryService.Add(Category);
         Categories = Categories.Append(Category);
-        Snackbar.Add("Successfully added category", Severity.Success, config =>
+        snackbar.Add("Successfully added category", Severity.Success, config =>
         {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+            snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-        
+
         Category = new();
     }
 
@@ -61,11 +69,11 @@
         ErrorMessage = string.Empty;
         await categoryService.Delete(categoryToDelete);
         Categories = Categories.Where(c => c.Id != Category.Id);
-        Snackbar.Add("Successfully removed category", Severity.Info, config =>
+        snackbar.Add("Successfully removed category", Severity.Info, config =>
         {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+            snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
-    
+        Categories = await categoryService.GetAll();
         Category = new();
     }
 
@@ -77,19 +85,18 @@
             ErrorMessage = "The category does not exist";
             return;
         }
-        ErrorMessage = string.Empty;
-        await categoryService.Update(categoryToEdit);
-        Snackbar.Add("Successfully edited category", Severity.Info, config =>
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
-        });
-        Categories = await categoryService.GetAll();
-        Category = new();
-    }
 
-    protected override async Task OnInitializedAsync()
-    {
-        Categories = await categoryService.GetAll();
+        var parameters = new DialogParameters<EditDialog<Category>>
+        {
+            { x => x.Model, categoryToEdit}
+        };
+
+        var dialogReference = await dialogService.ShowAsync<EditDialog<Category>>("Edit Category", parameters);
+        var result = await dialogReference.Result;
+        if (!result.Canceled)
+        {
+            await categoryService.Update((Category)result.Data);
+        }
     }
 
     private async Task<IEnumerable<string>> SearchCategory(string value, CancellationToken token)

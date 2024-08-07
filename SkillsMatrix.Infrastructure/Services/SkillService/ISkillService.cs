@@ -8,7 +8,7 @@ namespace SkillsMatrix.Infrastructure.Services.SkillService
         Task<IEnumerable<Skill>> GetAll();
         Task Add(Skill skill);
         Task Delete(Skill skill);
-        
+        Task Update(Skill skill);
 
 
 

@@ -2,6 +2,7 @@
 @inject ISkillService skillService
 @inject ICategoryService categoryService
 @inject ISnackbar Snackbar
+@inject IDialogService dialogService
 
 <PageTitle>Manage Skill</PageTitle>
 
@@ -20,11 +21,12 @@
             <NoItemsTemplate>
                 <MudText Align="Align.Center" Class="px-4 py-1">Skill to be added: @Skill.Name</MudText>
             </NoItemsTemplate>
-               
-       </MudAutocomplete>
+
+        </MudAutocomplete>
         <div class="mt-5">
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
-        <MudButton @onclick="DeleteSkill">Delete</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add</MudButton>
+            <MudButton @onclick="DeleteSkill">Delete</MudButton>
+            <MudButton @onclick="EditSkill">Edit</MudButton>
         </div>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -39,6 +41,12 @@
     private IEnumerable<Skill> Skills { get; set; }
     private IEnumerable<Category> Categories { get; set; }
     private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Skills = await skillService.GetAll();
+        Categories = await categoryService.GetAll();
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -77,10 +85,27 @@
         Skill = new();
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task EditSkill()
     {
-        Skills = await skillService.GetAll();
-        Categories = await categoryService.GetAll();
+        var skillToEdit = Skills.FirstOrDefault(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (skillToEdit == null)
+        {
+            ErrorMessage = "The skill does not exist";
+            return;
+        }
+
+        var parameters = new DialogParameters<EditDialog<Skill>>
+        {
+            { x => x.Model, skillToEdit},
+            { x => x.Categories, Categories}
+        };
+
+        var dialogReference = await dialogService.ShowAsync<EditDialog<Skill>>("Edit Skill", parameters);
+        var result = await dialogReference.Result;
+        if (!result.Canceled)
+        {
+            await skillService.Update((Skill)result.Data);
+        }
     }
 
     private async Task<IEnumerable<string>> SearchSkill(string value, CancellationToken token)
