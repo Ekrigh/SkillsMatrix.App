@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillsMatrix.Infrastructure;
 
@@ -11,9 +12,11 @@ using SkillsMatrix.Infrastructure;
 namespace SkillsMatrix.Infrastructure.Migrations
 {
     [DbContext(typeof(SMContext))]
-    partial class SMContextModelSnapshot : ModelSnapshot
+    [Migration("20240808132628_addedParentCategories")]
+    partial class addedParentCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

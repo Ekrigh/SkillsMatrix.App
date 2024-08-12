@@ -4,12 +4,12 @@
 }
 else
 {
-    <div>
+    <div class="mb-3">
         <h5>@UserSkillRating.Skill.Name</h5>
         <label>Current:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.Rating" MaxValue="6" />
-        <label>Ambition:</label>
-        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" MaxValue="6" />
+        <MudRating @bind-SelectedValue="UserSkillRating.Rating" EmptyIcon="@Icons.Material.Rounded.CropSquare" FullIcon="@Icons.Material.Rounded.Square" MaxValue="6" />
+        <label class="ml-1">Ambition:</label>
+        <MudRating @bind-SelectedValue="UserSkillRating.DesiredRating" EmptyIcon="@Icons.Material.Rounded.CropSquare" FullIcon="@Icons.Material.Rounded.Square" MaxValue="6"  />
     </div>
 }
 

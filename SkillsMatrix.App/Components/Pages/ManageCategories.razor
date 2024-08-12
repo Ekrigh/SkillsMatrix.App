@@ -5,10 +5,21 @@
 
 <PageTitle>Manage category</PageTitle>
 
-<div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029;">
+<div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029; min-width: 300px">
     <h3>Manage Category</h3>
+
+   
+
     <EditForm Model="@Category" FormName="AddEditCategory" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
+
+        <MudAutocomplete T="Category" Label="Choose a Parentcategory" MaxItems="null" @bind-Value="Category.ParentCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchParentCategory" ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true">
+            <NoItemsTemplate>
+                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                <MudLink Href="managecategories"><MudButton>Create new Category</MudButton></MudLink>
+            </NoItemsTemplate>
+        </MudAutocomplete>
+
         <MudAutocomplete T="string" Label="Enter category name" MaxItems="null" @bind-Value="Category.Name" SearchFuncWithCancel="@SearchCategory" ResetValueOnEmptyText="true" CoerceValue="true" CoerceText="false" Required="true" For="@(() => Category.Name)">
             <NoItemsTemplate>
                 <MudText Align="Align.Center" Class="px-4 py-1">Category to be added: @Category.Name</MudText>
@@ -88,7 +99,8 @@
 
         var parameters = new DialogParameters<EditDialog<Category>>
         {
-            { x => x.Model, categoryToEdit}
+            { x => x.Model, categoryToEdit},
+            { x => x.Categories, Categories}
         };
 
         var dialogReference = await dialogService.ShowAsync<EditDialog<Category>>("Edit Category", parameters);
@@ -104,5 +116,13 @@
         var CategoryNames = Categories.Select(category => category.Name).ToList();
         return string.IsNullOrEmpty(value) ? CategoryNames :
         CategoryNames.Where(category => category.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<Category>> SearchParentCategory(string value, CancellationToken token)
+    {
+        await Task.CompletedTask;
+        var result = string.IsNullOrEmpty(value) ? Categories :
+        Categories.Where(category => category.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return await Task.FromResult<IEnumerable<Category>>(result);
     }
 }

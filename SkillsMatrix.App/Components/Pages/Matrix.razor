@@ -9,7 +9,7 @@
 }
 else
 {
-    <MudDataGrid Class="m-5 rounded-lg w-75" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+    <MudDataGrid Class="m-5 rounded-lg w-75" FilterMode="DataGridFilterMode.ColumnFilterMenu" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users" Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
         <ToolBarContent>
             <MudFab Class="" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
             <MudFab Class="ml-1" Size="Size.Small" Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
@@ -22,7 +22,7 @@ else
             
             @foreach (var skill in Skills)
             {
-                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+                <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                     <HeaderTemplate>
 
                         <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
@@ -73,34 +73,33 @@ else
 
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
-        string style = "";
+        string style = "font-weight:bold; text-align:center";
         int? rating = GetUserSkillRating(user, skill);
 
         switch (rating)
         {
             case 1:
-                style = "background-color:#E94B41CC; text-align:center";
+                style += ";background-color:#E94B41CC";
                 break;
             case 2:
-                style = "background-color:#F28724CC; text-align:center";
+                style += ";background-color:#F28724CC";
                 break;
             case 3:
-                style = "background-color:#F2C024CC; text-align:center";
+                style += ";background-color:#F2C024CC";
                 break;
             case 4:
-                style = "background-color:#D1E329CC; text-align:center";
+                style += ";background-color:#D1E329CC";
                 break;
             case 5:
-                style = "background-color:#9CD751CC; text-align:center";
+                style += ";background-color:#9CD751CC";
                 break;
             case 6:
-                style = "background-color:#75C13CCC; text-align:center";
+                style += ";background-color:#75C13CCC";
                 break;
             default:
-                style = "background-color:#FCFCFC; text-align:center";
+                style += ";background-color:#FCFCFC";
                 break;
         }
-        style += ";font-weight:bold";
         return style;
     };
 

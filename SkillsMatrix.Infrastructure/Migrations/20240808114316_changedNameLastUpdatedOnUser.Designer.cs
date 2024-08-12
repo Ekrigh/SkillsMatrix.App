@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkillsMatrix.Infrastructure;
 
@@ -11,9 +12,11 @@ using SkillsMatrix.Infrastructure;
 namespace SkillsMatrix.Infrastructure.Migrations
 {
     [DbContext(typeof(SMContext))]
-    partial class SMContextModelSnapshot : ModelSnapshot
+    [Migration("20240808114316_changedNameLastUpdatedOnUser")]
+    partial class changedNameLastUpdatedOnUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,12 +40,7 @@ namespace SkillsMatrix.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories");
                 });
@@ -128,15 +126,6 @@ namespace SkillsMatrix.Infrastructure.Migrations
                     b.ToTable("UserSkillRatings");
                 });
 
-            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Category", b =>
-                {
-                    b.HasOne("SkillsMatrix.Infrastructure.Models.Category", "ParentCategory")
-                        .WithMany("Subcategories")
-                        .HasForeignKey("ParentCategoryId");
-
-                    b.Navigation("ParentCategory");
-                });
-
             modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>
                 {
                     b.HasOne("SkillsMatrix.Infrastructure.Models.Category", "Category")
@@ -165,11 +154,6 @@ namespace SkillsMatrix.Infrastructure.Migrations
                     b.Navigation("Skill");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Category", b =>
-                {
-                    b.Navigation("Subcategories");
                 });
 
             modelBuilder.Entity("SkillsMatrix.Infrastructure.Models.Skill", b =>

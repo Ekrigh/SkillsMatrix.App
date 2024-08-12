@@ -21,6 +21,15 @@
                     <MudTextField @bind-Value="skill.Name" Label="Skill Name" />
                     break;
                 case Category category:
+                    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="category.ParentCategory"
+                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory"
+                                     ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true">
+
+                        <NoItemsTemplate>
+                            <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+                            <MudLink Href="managecategories"><MudButton>Create new Category</MudButton></MudLink>
+                        </NoItemsTemplate>
+                    </MudAutocomplete>
                     <MudTextField @bind-Value="category.Name" Label="New category name:" />
                     break;
                 case User user:
