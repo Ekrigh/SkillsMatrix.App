@@ -15,8 +15,8 @@
         <InputText id="Email" @bind-Value="User.Email" class="form-control" />
         <ValidationMessage For="() => User.Email" />
         <div class="mt-5">
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
-            <MudButton @onclick="DeleteUser">Delete</MudButton>
+            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
+            <MudButton Disabled="@_processing" @onclick="DeleteUser">Delete</MudButton>
         </div>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -30,6 +30,7 @@
     private User User { get; set; } = new();
     private IEnumerable<User> Users { get; set; }
     private string ErrorMessage;
+    private bool _processing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,6 +39,7 @@
 
     private async Task HandleValidSubmit()
     {
+        _processing = true;
         if (Users.Any(user => user.Email.Equals(User.Email, StringComparison.InvariantCultureIgnoreCase)))
         {
             ErrorMessage = "This mailadress is already in use";
@@ -53,10 +55,12 @@
         });
 
         User = new();
+        _processing = false;
     }
 
     private async Task DeleteUser()
     {
+        _processing = true;
         var userToDelete = Users.FirstOrDefault(user => user.Email.Equals(User.Email, StringComparison.InvariantCultureIgnoreCase));
         if (userToDelete == null)
         {
@@ -72,5 +76,6 @@
         });
 
         User = new();
+        _processing = false;
     }
 }

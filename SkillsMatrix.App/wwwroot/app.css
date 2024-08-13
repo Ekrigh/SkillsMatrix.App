@@ -54,3 +54,15 @@ h1:focus {
     background-color: #0d3a52;
 }
 
+.chipMenu {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    white-space: nowrap;
+}
+
+.custom-grid .mud-table-cell .column-header .column-options .sort-direction-icon,
+.custom-grid .mud-table-cell .column-header .column-options .mud-menu .mud-icon-button-label {
+    opacity: 1 !important;
+}
+

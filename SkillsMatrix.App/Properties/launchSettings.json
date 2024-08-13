@@ -23,7 +23,7 @@
         "dotnetRunMessages": true,
         "launchBrowser": true,
         "applicationUrl": "https://localhost:7253;http://localhost:5205",
-        "launchUrl": "https://localhost:7253/discrepancymatrix",
+        "launchUrl": "https://localhost:7253/",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
         }

@@ -10,7 +10,7 @@
             {
                 case Skill skill:
                     <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="skill.Category"
-                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory"
+                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFunc="@SearchCategory"
                                      ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true" Required="true" For="@(() => skill.Category)">
 
                         <NoItemsTemplate>
@@ -21,8 +21,8 @@
                     <MudTextField @bind-Value="skill.Name" Label="Skill Name" />
                     break;
                 case Category category:
-                    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="category.ParentCategory"
-                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory"
+                    <MudAutocomplete T="Category" Label="Choose a Parentcategory" MaxItems="null" @bind-Value="category.ParentCategory"
+                                     ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFunc="@SearchCategory"
                                      ResetValueOnEmptyText="true" CoerceText="true" CoerceValue="true">
 
                         <NoItemsTemplate>
@@ -43,7 +43,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+        <MudButton Disabled="@_processing" OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
         <MudButton OnClick="Cancel" Color="Color.Error">Cancel</MudButton>
     </DialogActions>
 </MudDialog>
@@ -58,13 +58,17 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    private bool _processing = false;
+
     private void Submit()
     {
+        _processing = true;
         snackbar.Add("Edit Successful", Severity.Info, config =>
         {
             snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
         MudDialog.Close(DialogResult.Ok(Model));
+        _processing = false;
     }
 
     private void Cancel() => MudDialog.Cancel();

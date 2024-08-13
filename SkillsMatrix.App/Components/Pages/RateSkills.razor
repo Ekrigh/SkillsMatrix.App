@@ -7,7 +7,7 @@
 
 <div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029; min-width:550px">
     <h3>Rate Skills</h3>
-    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFuncWithCancel="@SearchCategory">
+    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFunc="@SearchCategory">
         <NoItemsTemplate>
             <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
         </NoItemsTemplate>
@@ -21,7 +21,7 @@
                 var userSkillRating = GetTempUserSkillRatingForSkill(skill);
                 <SkillRatingComponent UserSkillRating="userSkillRating"/>
             }
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
+            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
         </EditForm>
     }
 </div>
@@ -33,6 +33,7 @@
     private List<Skill> SkillsByCategory { get; set; }
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
     private List<UserSkillRating> TempUserRatingsForSelectedCategory { get; set; } = new();
+    private bool _processing = false;
     private Category _selectedCategory;
     [Parameter]
     public Category SelectedCategory
@@ -74,6 +75,7 @@
 
     private async Task HandleValidSubmit()
     {
+        _processing = true;
         foreach (var tempUserSkillRating in TempUserRatingsForSelectedCategory)
         {
             tempUserSkillRating.LastUpdated = DateTime.Now;
@@ -97,6 +99,7 @@
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
         });
+        _processing = false;
     }
 
     private async Task<IEnumerable<Category>> SearchCategory(string value, CancellationToken token)
