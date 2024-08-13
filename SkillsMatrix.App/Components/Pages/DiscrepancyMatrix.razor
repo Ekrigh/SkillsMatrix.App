@@ -32,7 +32,6 @@ else
             </MudChipSet>
         </div>
 
-
         <div class="mt-5">
             @if (detailedViewBox)
             {
@@ -51,8 +50,6 @@ else
                                 <MudText><strong>Total:</strong></MudText>
                             </FooterTemplate>
                         </PropertyColumn>
-
-
 
                         @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                         {
@@ -75,7 +72,7 @@ else
                             <TemplateColumn Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
                                 <HeaderTemplate>
                                     <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
-                                        <MudText><b>@skill.Name</b></MudText>
+                                        <MudText><strong>@skill.Name</strong></MudText>
                                     </MudTooltip>
                                 </HeaderTemplate>
                                 <CellTemplate>
@@ -142,6 +139,9 @@ else
 
                     <Columns>
                         <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+                            <HeaderTemplate>
+                                    <MudText><strong>User</strong></MudText>
+                            </HeaderTemplate>
                             <FooterTemplate>
                                 <MudText Class="sticky-footer"><strong>Total:</strong></MudText>
                             </FooterTemplate>
@@ -151,7 +151,11 @@ else
                         {
                             <PropertyColumn Property="user => GetDiscrepancy(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))"
                                             AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
-
+                                <HeaderTemplate>
+                                    <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+                                        <MudText><strong>@skill.Name</strong></MudText>
+                                    </MudTooltip>
+                                </HeaderTemplate>
                                 <CellTemplate>
                                     @{
                                         var rating = GetRating(context.Item, skill);
@@ -172,8 +176,6 @@ else
         }
     </div>
 }
-
-
 
 @code {
 

@@ -5,34 +5,78 @@
 @inject ISkillService skillService
 @inject ISnackbar Snackbar
 
-<div class="p-5 m-5 rounded-lg w-25" Style="box-shadow: 0px 3px 6px 0px #20202029; min-width:550px">
+@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatings == null || !UserSkillRatings.Any()))
+{
+    <p>Loading...</p>
+}
+else
+{
+
+        <div class="p-5 m-5 rounded-lg" Style="box-shadow: 0px 3px 6px 0px #20202029; min-width:550px">
+        @*
     <h3>Rate Skills</h3>
-    <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFunc="@SearchCategory">
-        <NoItemsTemplate>
-            <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
-        </NoItemsTemplate>
-    </MudAutocomplete>
+        <MudAutocomplete T="Category" Label="Choose a category" MaxItems="null" @bind-Value="SelectedCategory" ToStringFunc="@(category => category==null?null: $"{category.Name}")" SearchFunc="@SearchCategory">
+            <NoItemsTemplate>
+                <MudText Align="Align.Center" Class="px-4 py-1">No matching categories found</MudText>
+            </NoItemsTemplate>
+        </MudAutocomplete>
+
+        @if (SelectedCategory != null)
+        {
+            <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit" class="mt-5">
+                @foreach (var skill in SkillsByCategory)
+                {
+                    var userSkillRating = GetTempUserSkillRatingForSkill(skill);
+                    <SkillRatingComponent UserSkillRating="userSkillRating" />
+                }
+                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
+            </EditForm>
+        } *@
 
     @if (SelectedCategory != null)
     {
         <EditForm Model="UserSkillRatings" OnValidSubmit="HandleValidSubmit" class="mt-5">
+            <MudTabs @bind-ActivePanelIndex="SelectedCategoryIndex" Elevation="2" Rounded="true" ApplyEffectsToContainer="true">
+                @foreach (var category in Categories)
+                {
+
+                    <MudTabPanel ID="@category.Id" Text="@category.Name">
+                    </MudTabPanel>
+                }
+            </MudTabs>
+
             @foreach (var skill in SkillsByCategory)
             {
                 var userSkillRating = GetTempUserSkillRatingForSkill(skill);
-                <SkillRatingComponent UserSkillRating="userSkillRating"/>
+                <SkillRatingComponent UserSkillRating="userSkillRating" />
             }
+
             <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="mt-5" Color="Color.Primary">Save All Ratings</MudButton>
+
         </EditForm>
     }
-</div>
-@code
-{
+        </div>
+
+    @code
+    {
+    private int _selectedCategoryIndex;
+    private int SelectedCategoryIndex
+    {
+        get => _selectedCategoryIndex;
+        set
+        {
+            if (_selectedCategoryIndex == value) return;
+            _selectedCategoryIndex = value;
+            SelectedCategory = Categories.ElementAt(_selectedCategoryIndex);
+        }
+    }
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
     private List<Skill> SkillsByCategory { get; set; }
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
-    private List<UserSkillRating> TempUserRatingsForSelectedCategory { get; set; } = new();
+    private List<UserSkillRating> TempUserRatings { get; set; } = new();
+    //private List<UserSkillRating> TempUserRatingsForSelectedCategory { get; set; } = new();
     private bool _processing = false;
     private Category _selectedCategory;
     [Parameter]
@@ -44,21 +88,23 @@
             if (_selectedCategory == value) return;
             _selectedCategory = value;
             SkillsByCategory = Skills.Where(skill => skill.CategoryId == _selectedCategory.Id).ToList();
-            TempUserRatingsForSelectedCategory = CreateDeepCopy(UserSkillRatings.Where(usr => SkillsByCategory.Any(skill => skill.Id == usr.SkillId)).ToList());
+            TempUserRatings = CreateDeepCopy(UserSkillRatings.Where(usr => SkillsByCategory.Any(skill => skill.Id == usr.SkillId)).ToList());
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
         currentUser = await userService.GetById(12);
-        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
         Categories = await categoryService.GetAll();
         Skills = await skillService.GetAll();
+        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
+        SelectedCategory = Categories.First();
     }
 
     private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
     {
-        var userSkillRating = TempUserRatingsForSelectedCategory.FirstOrDefault(usr => usr.SkillId == skill.Id);
+
+        var userSkillRating = TempUserRatings?.FirstOrDefault(usr => usr.SkillId == skill.Id);
         if (userSkillRating == null)
         {
             userSkillRating = new UserSkillRating
@@ -68,7 +114,7 @@
                     Skill = skill,
                     User = currentUser,
                 };
-            TempUserRatingsForSelectedCategory.Add(userSkillRating);
+            TempUserRatings.Add(userSkillRating);
         }
         return userSkillRating;
     }
@@ -76,7 +122,7 @@
     private async Task HandleValidSubmit()
     {
         _processing = true;
-        foreach (var tempUserSkillRating in TempUserRatingsForSelectedCategory)
+        foreach (var tempUserSkillRating in TempUserRatings)
         {
             tempUserSkillRating.LastUpdated = DateTime.Now;
             var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempUserSkillRating.SkillId);
@@ -121,4 +167,5 @@
                 DesiredRating = item.DesiredRating
             }).ToList();
     }
+}
 }

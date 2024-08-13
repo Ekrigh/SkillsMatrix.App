@@ -14,7 +14,7 @@ else
         <h3 class="ml-1">Skillsmatrix</h3>
 
         <div Class="d-flex mw-50">
-            <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary"/>
+            <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
                 @foreach (var category in Categories)
                 {
@@ -33,7 +33,11 @@ else
             </ToolBarContent>
 
             <Columns>
-                <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" />
+                <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+                <HeaderTemplate>
+                    <MudText><strong>User</strong></MudText>
+                </HeaderTemplate>
+                </PropertyColumn>
 
                 @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                 {

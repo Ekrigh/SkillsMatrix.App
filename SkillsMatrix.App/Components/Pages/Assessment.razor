@@ -1,0 +1,110 @@
+﻿@page "/assessment"
+@inject IUserSkillRatingService userSkillRatingService
+@inject ICategoryService categoryService
+@inject IUserService userService
+@inject ISkillService skillService
+@inject ISnackbar Snackbar
+
+@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatings == null || !UserSkillRatings.Any()))
+{
+    <p>Loading...</p>
+}
+else
+{
+    <BLStepper Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true">
+        <StepTemplate>
+            @category.Name
+        </StepTemplate>
+        <ContentTemplate>
+            @{
+                SkillsByCategory = Skills.Where(s => s.CategoryId == category.Id);
+                foreach (var skill in SkillsByCategory)
+                {
+                    var userSkillRating = GetTempUserSkillRatingForSkill(skill);
+                    <SkillRatingComponent UserSkillRating="userSkillRating" />
+                }
+            }
+            
+        </ContentTemplate>
+    </BLStepper>
+
+}
+
+@code {
+    private User currentUser;
+    private IEnumerable<Category> Categories { get; set; }
+    private IEnumerable<Skill> Skills { get; set; }
+    private IEnumerable<Skill> SkillsByCategory { get; set; }
+    private List<UserSkillRating> UserSkillRatings { get; set; } = new();
+    private List<UserSkillRating> TempUserRatings { get; set; } = new();
+    private bool _processing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await userService.GetById(12);
+        Categories = await categoryService.GetAll();
+        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
+        Skills = await skillService.GetAll();  
+        TempUserRatings = CreateDeepCopy(UserSkillRatings.Where(usr => Skills.Any(skill => skill.Id == usr.SkillId)).ToList());
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _processing = true;
+        foreach (var tempUserSkillRating in TempUserRatings)
+        {
+            tempUserSkillRating.LastUpdated = DateTime.Now;
+            var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempUserSkillRating.SkillId);
+            if (originalRating != null)
+            {
+                originalRating.Rating = tempUserSkillRating.Rating;
+                originalRating.DesiredRating = tempUserSkillRating.DesiredRating;
+                originalRating.LastUpdated = DateTime.Now;
+            }
+            else
+            {
+                UserSkillRatings.Add(tempUserSkillRating);
+            }
+        }
+
+        currentUser.LastSurvey = DateTime.Now;
+
+        await userSkillRatingService.AddAll(UserSkillRatings);
+        Snackbar.Add("Ratings saved", Severity.Success, config =>
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
+        _processing = false;
+    }
+
+    private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
+    {
+
+        var userSkillRating = TempUserRatings?.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        if (userSkillRating == null)
+        {
+            userSkillRating = new UserSkillRating
+                {
+                    UserId = currentUser.Id,
+                    SkillId = skill.Id,
+                    Skill = skill,
+                    User = currentUser,
+                };
+            TempUserRatings.Add(userSkillRating);
+        }
+        return userSkillRating;
+    }
+
+    private List<UserSkillRating> CreateDeepCopy(List<UserSkillRating> originalList)
+    {
+        return originalList.Select(item => new UserSkillRating
+            {
+                UserId = item.UserId,
+                SkillId = item.SkillId,
+                Skill = item.Skill,
+                User = item.User,
+                Rating = item.Rating,
+                DesiredRating = item.DesiredRating
+            }).ToList();
+    }
+}

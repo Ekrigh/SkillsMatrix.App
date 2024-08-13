@@ -1,0 +1,130 @@
+.bl-stepper {
+    margin: 50px;
+}
+
+.bl-stepper-header {
+    display: flex;
+}
+
+.bl-stepper-header .bl-stepper-header-title {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #1D1D1B;
+    font-weight: 500;
+    padding: 20px 0;
+}
+
+    .bl-stepper-header .bl-stepper-header-actions {
+        display: flex;
+        align-items: center;
+    }
+
+.bl-steps-container {
+    padding: 20px 20px 50px 20px;
+    display: flex;
+    align-items: stretch;
+}
+
+.bl-step {
+    flex-grow: 1;
+    display: flex;
+    opacity: 0.4;
+}
+
+.bl-step-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bl-step-line {
+    background: gray;
+    flex-grow: 1;
+    height: 2px;
+    margin: 10px 10px 0 10px;
+}
+
+.bl-step:last-of-type {
+    flex-grow: 0;
+}
+
+.bl-step:last-of-type .bl-step-line {
+    display: none;
+}
+
+.bl-step-dot {
+    background: gray;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bl-step-dot .mud-icon-root {
+    font-size: 12px;
+    display: none;
+    font-weight: 800;
+}
+
+.bl-step-text {
+    position: absolute;
+    margin-top: 25px;
+    font-size: 12px;
+}
+
+.bl-tabs-container .mud-tabs-tabbar {
+    display: none;
+}
+
+.bl-step-active,
+.bl-step-ready {
+    opacity: 1;
+}
+
+.bl-step-active {
+    color: rgb(33, 150, 243);
+}
+
+    .bl-step-active .bl-step-dot {
+        background: white;
+        border: solid 2px rgb(33, 150, 243);
+    }
+
+
+.bl-step-ready .bl-step-dot,
+.bl-step-ready .bl-step-line {
+    background: rgb(33, 150, 243);
+}
+
+
+.bl-step-active .bl-step-line {
+    opacity: 0.4;
+}
+
+.bl-step-ready .bl-step-dot .mud-icon-root {
+    display: block;
+}
+
+.bl-step-active .bl-step-text {
+    font-weight: 700;
+}
+
+.bl-stepper .bl-tabs-container {
+    padding: 0 12px;
+}
+
+.bl-stepper .bl-tabs-container .mud-card-header-content {
+    font-size: 18px;
+    color: #3B3A41;
+    font-weight: 500;
+}
+
+.bl-stepper .bl-tabs-container .mud-card-header-actions {
+    display: flex;
+    gap: 8px;
+}
