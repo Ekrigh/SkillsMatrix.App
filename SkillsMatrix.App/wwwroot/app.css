@@ -13,7 +13,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -55,10 +55,12 @@ h1:focus {
 }
 
 .chipMenu {
+    align-content: center;
     overflow-x: scroll;
-    overflow-y: hidden;
     scrollbar-width: none;
     white-space: nowrap;
+    scrollbar-width: none;
+    margin-bottom: -4px;
 }
 
 .custom-grid .mud-table-cell .column-header .column-options .sort-direction-icon,
@@ -66,3 +68,62 @@ h1:focus {
     opacity: 1 !important;
 }
 
+
+
+.rating-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+@media (min-width: 1800px) {
+    .rating-grid {
+        grid-template-columns: repeat(3, minmax(340px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .rating-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.numbered-ratings .mud-rating-item {
+    position: relative;
+}
+
+    .numbered-ratings .mud-rating-item:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        color: black;
+        width: 24px;
+        height: 24px;
+        text-align: center;
+        line-height: 24px;
+        font-size: 12px;
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(1):before {
+        content: '1';
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(2):before {
+        content: '2';
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(3):before {
+        content: '3';
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(4):before {
+        content: '4';
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(5):before {
+        content: '5';
+    }
+
+    .numbered-ratings .mud-rating-item:nth-of-type(6):before {
+        content: '6';
+    }

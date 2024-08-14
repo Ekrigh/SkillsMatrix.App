@@ -1,0 +1,53 @@
+﻿<h3>FilterMenu</h3>
+
+<MudPopover AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+    <div class="m-2">
+
+        <h3>Filter Matrix</h3>
+
+        <MudToggleGroup T="int" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_ratings">
+            <MudToggleItem Value="1" />
+            <MudToggleItem Value="2" />
+            <MudToggleItem Value="3" />
+            <MudToggleItem Value="4" />
+            <MudToggleItem Value="5" />
+            <MudToggleItem Value="6" />
+        </MudToggleGroup>
+    </div>
+</MudPopover>
+
+@code {
+    private IEnumerable<int> _ratings;
+
+
+    private string getColor(int rating)
+    {
+        string style = "font-weight:bold; text-align:center";
+        switch (rating)
+        {
+            case 1:
+                style += ";background-color:#E94B41CC";
+                break;
+            case 2:
+                style += ";background-color:#F28724CC";
+                break;
+            case 3:
+                style += ";background-color:#F2C024CC";
+                break;
+            case 4:
+                style += ";background-color:#D1E329CC";
+                break;
+            case 5:
+                style += ";background-color:#9CD751CC";
+                break;
+            case 6:
+                style += ";background-color:#75C13CCC";
+                break;
+            default:
+                style += ";background-color:#FCFCFC";
+                break;
+        }
+        return style;
+    }
+
+}

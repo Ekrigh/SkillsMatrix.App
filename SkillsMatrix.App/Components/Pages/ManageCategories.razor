@@ -58,6 +58,7 @@
         if (Categories.Any(category => category.Name.Equals(Category.Name, StringComparison.InvariantCultureIgnoreCase)))
         {
             ErrorMessage = "The category already exists";
+            _processing = false;
             return;
         }
         ErrorMessage = string.Empty;
@@ -80,6 +81,7 @@
         if (categoryToDelete == null)
         {
             ErrorMessage = "The category does not exist";
+            _processing = false;
             return;
         }
         ErrorMessage = string.Empty;
@@ -101,6 +103,7 @@
         if (categoryToEdit == null)
         {
             ErrorMessage = "The category does not exist";
+            _processing = false;
             return;
         }
 

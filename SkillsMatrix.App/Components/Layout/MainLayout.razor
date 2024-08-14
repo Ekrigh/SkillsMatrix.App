@@ -15,7 +15,6 @@
         <MudAvatar Style="background-color:#009FE34D" Class="mr-5">
             <MudIcon Style="Color:white" Icon="@Icons.Material.Outlined.PersonOutline"></MudIcon>
         </MudAvatar>
-
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Docked">
         <MyNavMenu />
@@ -44,9 +43,9 @@
             PaletteLight = new PaletteLight()
             {
                 Primary = new MudBlazor.Utilities.MudColor("#0d3a52"),
-                Secondary = Colors.Green.Accent4,
+                Secondary = new MudBlazor.Utilities.MudColor("#2196F3"),
+                Tertiary = new MudBlazor.Utilities.MudColor("#c4c4c4"),
                 AppbarBackground = new MudBlazor.Utilities.MudColor("#FFFFFF"),
-
             }
         };
 }

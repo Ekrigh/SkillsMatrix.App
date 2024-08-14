@@ -11,30 +11,28 @@
 }
 else
 {
-    <BLStepper Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true">
-        <StepTemplate>
-            @category.Name
-        </StepTemplate>
-        <ContentTemplate>
-            @{
-                SkillsByCategory = Skills.Where(s => s.CategoryId == category.Id);
-                foreach (var skill in SkillsByCategory)
-                {
-                    var userSkillRating = GetTempUserSkillRatingForSkill(skill);
-                    <SkillRatingComponent UserSkillRating="userSkillRating" />
-                }
-            }
-            
-        </ContentTemplate>
-    </BLStepper>
-
+    <div class="w-100">
+        <BLStepper Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true">
+            <StepTemplate>
+                @category.Name
+            </StepTemplate>
+            <ContentTemplate>
+                <div class="rating-grid">
+                    @foreach (var skill in Skills.Where(s => s.CategoryId == category.Id))
+                    {
+                        var userSkillRating = GetTempUserSkillRatingForSkill(skill);
+                        <SkillRatingComponent UserSkillRating="userSkillRating" />
+                    }
+                </div>
+            </ContentTemplate>
+        </BLStepper>
+    </div>
 }
 
 @code {
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
-    private IEnumerable<Skill> SkillsByCategory { get; set; }
     private List<UserSkillRating> UserSkillRatings { get; set; } = new();
     private List<UserSkillRating> TempUserRatings { get; set; } = new();
     private bool _processing = false;
@@ -44,7 +42,7 @@ else
         currentUser = await userService.GetById(12);
         Categories = await categoryService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
-        Skills = await skillService.GetAll();  
+        Skills = await skillService.GetAll();
         TempUserRatings = CreateDeepCopy(UserSkillRatings.Where(usr => Skills.Any(skill => skill.Id == usr.SkillId)).ToList());
     }
 
@@ -79,8 +77,7 @@ else
 
     private UserSkillRating GetTempUserSkillRatingForSkill(Skill skill)
     {
-
-        var userSkillRating = TempUserRatings?.FirstOrDefault(usr => usr.SkillId == skill.Id);
+        var userSkillRating = TempUserRatings.FirstOrDefault(usr => usr.SkillId == skill.Id);
         if (userSkillRating == null)
         {
             userSkillRating = new UserSkillRating
@@ -95,9 +92,9 @@ else
         return userSkillRating;
     }
 
-    private List<UserSkillRating> CreateDeepCopy(List<UserSkillRating> originalList)
+    private List<UserSkillRating> CreateDeepCopy(List<UserSkillRating> originalRatings)
     {
-        return originalList.Select(item => new UserSkillRating
+        return originalRatings.Select(item => new UserSkillRating
             {
                 UserId = item.UserId,
                 SkillId = item.SkillId,

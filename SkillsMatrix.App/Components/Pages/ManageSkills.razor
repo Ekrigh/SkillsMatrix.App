@@ -56,6 +56,7 @@
         if (Skills.Any(skill => skill.Name.Equals(Skill.Name, StringComparison.InvariantCultureIgnoreCase)))
         {
             ErrorMessage = "The skill already exists";
+            _processing = false;
             return;
         }
         ErrorMessage = string.Empty;
@@ -77,6 +78,7 @@
         if (skillToDelete == null)
         {
             ErrorMessage = "The skill does not exist";
+            _processing = false;
             return;
         }
         ErrorMessage = string.Empty;
@@ -98,6 +100,7 @@
         if (skillToEdit == null)
         {
             ErrorMessage = "The skill does not exist";
+            _processing = false;
             return;
         }
 

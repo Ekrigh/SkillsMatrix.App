@@ -13,43 +13,40 @@ else
     <div class="m-5">
         <h3 class="ml-1">Skillsmatrix</h3>
 
-        <div Class="d-flex mw-50">
-            <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
+        <div Class="d-flex">
+
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
+                <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
                 @foreach (var category in Categories)
                 {
                     <MudChip Value="@category" Text="@category.Name" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
                 }
             </MudChipSet>
+            <MudSpacer />
+            <MudIconButton Class="ml-3" Color="Color.Primary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="ShowFilterMenu" />
+            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
+            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
+            <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 
-        <MudDataGrid Class="mt-5 rounded-lg w-75" FilterMode="DataGridFilterMode.ColumnFilterMenu" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users"
+        <MudDataGrid Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users"
                      Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
-            <ToolBarContent>
-                <MudFab Class="" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
-                <MudFab Class="ml-1" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
-                <MudTextField Style="width:320px; align-self: end" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
-                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
-            </ToolBarContent>
-
             <Columns>
-                <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
-                <HeaderTemplate>
-                    <MudText><strong>User</strong></MudText>
-                </HeaderTemplate>
+                <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" Filterable="false">
+                    <HeaderTemplate>
+                        <MudText><strong>User</strong></MudText>
+                    </HeaderTemplate>
                 </PropertyColumn>
 
                 @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                 {
                     <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                         <HeaderTemplate>
-
                             <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                                 <MudText><b>@skill.Name</b></MudText>
                             </MudTooltip>
-
                         </HeaderTemplate>
-
                     </PropertyColumn>
                 }
             </Columns>
@@ -138,6 +135,11 @@ else
     private void ShowColumnsMenu()
     {
         matrixGrid.ShowColumnsPanel();
+    }
+
+    private void ShowFilterMenu()
+    {
+        matrixGrid.ToggleFiltersMenu();
     }
 
     private void ShowAllSkills()

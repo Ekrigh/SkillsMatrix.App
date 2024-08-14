@@ -1,0 +1,60 @@
+﻿@* <h3>FilterMenu</h3>
+<MudStack>
+    @foreach (var f in FilterDefinitions)
+    {
+        @Filter(f, null)
+    }
+</MudStack>
+<MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Add" OnClick="@AddFilter" Color="@Color.Primary">@Localizer[LanguageResource.MudDataGrid_AddFilter]</MudButton>
+@if (HasServerData)
+{
+    <MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Add" OnClick="@ApplyFiltersAsync" Color="@Color.Primary">@Localizer[LanguageResource.MudDataGrid_Apply]</MudButton>
+}
+<MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Remove" OnClick="@ClearFiltersAsync" Color="@Color.Primary">@Localizer[LanguageResource.MudDataGrid_Clear]</MudButton>
+@code {
+    internal void AddFilter()
+    {
+        var filterDefinition = Column?.FilterContext.FilterDefinition;
+        if (DataGrid.FilterMode == DataGridFilterMode.Simple && filterDefinition != null)
+        {
+            if (DataGrid.FilterDefinitions.All(x => x.Title != filterDefinition.Title))
+            {
+                DataGrid.FilterDefinitions.Add(filterDefinition.Clone());
+            }
+            DataGrid.OpenFilters();
+        }
+        else if (DataGrid.FilterMode == DataGridFilterMode.ColumnFilterMenu)
+        {
+            _filtersMenuVisible = true;
+            DataGrid.DropContainerHasChanged();
+        }
+    }
+
+    internal async Task ApplyFilterAsync()
+    {
+        DataGrid.FilterDefinitions.Add(Column.FilterContext.FilterDefinition);
+        if (DataGrid.HasServerData)
+        {
+            await DataGrid.ReloadServerData();
+        }
+        else
+        {
+            ((IMudStateHasChanged)DataGrid).StateHasChanged();
+        }
+        _filtersMenuVisible = false;
+        DataGrid.DropContainerHasChanged();
+    }
+
+    internal async Task ClearFilterAsync()
+    {
+        Column.FilterContext.FilterDefinition.Value = null;
+        await DataGrid.RemoveFilterAsync(Column.FilterContext.FilterDefinition.Id);
+        if (!DataGrid.HasServerData)
+            ((IMudStateHasChanged)DataGrid).StateHasChanged();
+        _filtersMenuVisible = false;
+        DataGrid.DropContainerHasChanged();
+    }
+
+
+}
+ *@
