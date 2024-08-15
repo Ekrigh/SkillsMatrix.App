@@ -53,13 +53,13 @@ else
         {
             tempUserSkillRating.LastUpdated = DateTime.Now;
             var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempUserSkillRating.SkillId);
-            if (originalRating != null)
+            if (originalRating != null && (originalRating.Rating != tempUserSkillRating.Rating || originalRating.DesiredRating != tempUserSkillRating.DesiredRating))
             {
                 originalRating.Rating = tempUserSkillRating.Rating;
                 originalRating.DesiredRating = tempUserSkillRating.DesiredRating;
                 originalRating.LastUpdated = DateTime.Now;
             }
-            else
+            else if(originalRating == null)
             {
                 UserSkillRatings.Add(tempUserSkillRating);
             }

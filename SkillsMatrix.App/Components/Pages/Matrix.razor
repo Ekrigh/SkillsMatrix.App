@@ -14,7 +14,6 @@ else
         <h3 class="ml-1">Skillsmatrix</h3>
 
         <div Class="d-flex">
-
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
                 <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
                 @foreach (var category in Categories)
@@ -25,12 +24,12 @@ else
             <MudSpacer />
             <MudIconButton Class="ml-3" Color="Color.Primary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="ShowFilterMenu" />
             <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="ShowColumnsMenu" />
-            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearFilters" />
+            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="ClearGridFiltersAsync" />
             <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 
-        <MudDataGrid Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="matrixGrid" T="User" Items="@Users"
+        <MudDataGrid @ref="matrixGrid" Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@Users"
                      Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
             <Columns>
                 <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" Filterable="false">
@@ -41,7 +40,7 @@ else
 
                 @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                 {
-                    <PropertyColumn Property="user => GetUserSkillRating(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+                    <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id).Result" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                         <HeaderTemplate>
                             <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                                 <MudText><b>@skill.Name</b></MudText>
@@ -70,9 +69,7 @@ else
 
     private Func<User, bool> _quickFilter => user =>
       {
-          if (string.IsNullOrWhiteSpace(_searchString)) return true;
-          if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-          return false;
+          return string.IsNullOrWhiteSpace(_searchString) || user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
       };
 
     protected override async Task OnInitializedAsync()
@@ -83,17 +80,10 @@ else
         UserSkillRatings = await userSkillRatingService.GetAll();
     }
 
-    private int GetUserSkillRating(User user, Skill skill)
-    {
-        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
-        .FirstOrDefault(usr => usr.SkillId == skill.Id);
-        return userSkillRating?.Rating ?? 0;
-    }
-
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
         string style = "font-weight:bold; text-align:center";
-        int? rating = GetUserSkillRating(user, skill);
+        int? rating = userSkillRatingService.GetRating(user.Id, skill.Id).Result;
 
         switch (rating)
         {
@@ -122,9 +112,9 @@ else
         return style;
     };
 
-    private async void ClearFilters()
+    private async Task ClearGridFiltersAsync()
     {
-        matrixGrid.ClearFiltersAsync();
+        await matrixGrid.ClearFiltersAsync();
 
         foreach (var column in matrixGrid.RenderedColumns)
         {

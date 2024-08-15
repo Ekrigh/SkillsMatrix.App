@@ -32,7 +32,7 @@ else
             <MudSpacer />
             <MudIconButton Class="ml-3" Color="Color.Primary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? matrixGrid: discrepancyMatrixGrid))" />
             <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="@(() => ShowColumnsMenu(detailedViewBox ? matrixGrid: discrepancyMatrixGrid))" />
-            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="@(() => ClearGridFilters(detailedViewBox ? matrixGrid: discrepancyMatrixGrid))" />
+            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="@(() => ClearGridFiltersAsync(detailedViewBox ? matrixGrid: discrepancyMatrixGrid))" />
             <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
@@ -51,7 +51,7 @@ else
                     @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                     {
                         var titleString = $"{skill.Name} Rating";
-                        <PropertyColumn Property="user => GetRating(user, skill)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
+                        <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
                             <HeaderTemplate>
                                 <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                                     <MudText><b>@skill.Name</b></MudText>
@@ -59,17 +59,17 @@ else
                             </HeaderTemplate>
                             <CellTemplate>
                                 <MudTooltip Text="rating" Arrow="true" Placement="Placement.Top">
-                                    <MudText><strong>@GetRating(context.Item, skill)</strong></MudText>
+                                    <MudText><strong>@userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result</strong></MudText>
                                 </MudTooltip>
                             </CellTemplate>
                         </PropertyColumn>
 
                         titleString = $"{skill.Name} Desired Rating";
-                        <PropertyColumn Property="user => GetDesiredRating(user, skill)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+                        <PropertyColumn Property="user => userSkillRatingService.GetDesiredRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
                             <HeaderTemplate />
                             <CellTemplate>
                                 @{
-                                    var desiredRating = GetDesiredRating(context.Item, skill);
+                                    var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
                                 }
                                 <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
                                     <MudText><strong>@desiredRating</strong></MudText>
@@ -78,14 +78,11 @@ else
                         </PropertyColumn>
 
                         titleString = $"{skill.Name} Discrepancy";
-                        <PropertyColumn Property="user => GetDiscrepancy(user, skill)" Title="@titleString" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
+                        <PropertyColumn Property="user => userSkillRatingService.GetDiscrepancy(user, skill)" Title="@titleString" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
                             <HeaderTemplate />
                             <CellTemplate>
-                                @{
-                                    var Discrepancy = GetDiscrepancy(context.Item, skill);
-                                }
                                 <MudTooltip Text="Discrepancy" Arrow="true" Placement="Placement.Top">
-                                    <MudText><strong>@Discrepancy</strong></MudText>
+                                    <MudText><strong>@userSkillRatingService.GetDiscrepancy(context.Item, skill)</strong></MudText>
                                 </MudTooltip>
                             </CellTemplate>
                         </PropertyColumn>
@@ -109,7 +106,7 @@ else
 
                     @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                     {
-                        <PropertyColumn Property="user => GetDiscrepancy(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))"
+                    <PropertyColumn Property="user => userSkillRatingService.GetDiscrepancy(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))"
                                         AggregateDefinition="_discrepancyAggregation" Sortable="true">
                             <HeaderTemplate>
                                 <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
@@ -118,9 +115,9 @@ else
                             </HeaderTemplate>
                             <CellTemplate>
                                 @{
-                                    var rating = GetRating(context.Item, skill);
-                                    var desiredRating = GetDesiredRating(context.Item, skill);
-                                    var discrepancy = GetDiscrepancy(context.Item, skill);
+                                    var rating = userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result;
+                                    var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
+                                    var discrepancy = userSkillRatingService.GetDiscrepancy(context.Item, skill);
                                     string tooltip = $"Rating: {rating}, Desired: {desiredRating}";
                                 }
                                 <MudTooltip Text="@tooltip" Arrow="true" Placement="Placement.Top">
@@ -134,10 +131,8 @@ else
         }
     </div>
 }
-}
 
 @code {
-
     private IEnumerable<User> Users { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
     private IEnumerable<Category> Categories { get; set; }
@@ -147,7 +142,6 @@ else
     private MudDataGrid<User> discrepancyMatrixGrid;
     private string _searchString;
     public bool detailedViewBox { get; set; } = false;
-    private List<double> averages = new();
     private AggregateDefinition<User> _discrepancyAggregation = new AggregateDefinition<User>
         {
 
@@ -157,9 +151,7 @@ else
 
     private Func<User, bool> _quickFilter => user =>
       {
-          if (string.IsNullOrWhiteSpace(_searchString)) return true;
-          if (user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-          return false;
+          return string.IsNullOrWhiteSpace(_searchString) || user.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
       };
 
     protected override async Task OnInitializedAsync()
@@ -170,32 +162,10 @@ else
         UserSkillRatings = await userSkillRatingService.GetAll();
     }
 
-    private int GetDiscrepancy(User user, Skill skill)
-    {
-        var rating = GetRating(user, skill);
-        var desiredRating = GetDesiredRating(user, skill);
-        var discrepancy = rating - desiredRating;
-        return discrepancy < 0 ? discrepancy : 0;
-    }
-
-    private int GetRating(User user, Skill skill)
-    {
-        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
-        .FirstOrDefault(usr => usr.SkillId == skill.Id);
-        return userSkillRating?.Rating ?? 0;
-    }
-
-    private int GetDesiredRating(User user, Skill skill)
-    {
-        var userSkillRating = UserSkillRatings.Where(usr => usr.UserId == user.Id)
-        .FirstOrDefault(usr => usr.SkillId == skill.Id);
-        return userSkillRating?.DesiredRating ?? 0;
-    }
-
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
         string style = "font-weight:bold;text-align:center";
-        int? ratingDiff = GetRating(user, skill) - GetDesiredRating(user, skill);
+        int? ratingDiff = userSkillRatingService.GetDiscrepancy(user, skill);
 
         switch (ratingDiff)
         {
@@ -221,9 +191,9 @@ else
         return style;
     };
 
-    private async void ClearGridFilters(MudDataGrid<User> datagrid)
+    private async Task ClearGridFiltersAsync(MudDataGrid<User> datagrid)
     {
-        datagrid.ClearFiltersAsync();
+        await datagrid.ClearFiltersAsync();
 
         foreach (var column in datagrid.RenderedColumns)
         {

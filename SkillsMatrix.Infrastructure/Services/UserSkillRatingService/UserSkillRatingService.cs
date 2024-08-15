@@ -49,5 +49,25 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
         {
             await _userSkillRatingRepository.AddAll(userSkillRatings);
         }
+
+        public async Task<int> GetRating(int userId, int skillId)
+        {
+            var userSkillRating = _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
+            return userSkillRating?.Rating ?? 0;
+        }
+
+        public async Task<int> GetDesiredRating(int userId, int skillId)
+        {
+            var userSkillRating = _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
+            return userSkillRating?.DesiredRating ?? 0;
+        }
+
+        public int GetDiscrepancy(User user, Skill skill)
+        {
+            var rating = _userSkillRatingRepository.GetByUserIdAndSkillId(user.Id, skill.Id)?.Rating ?? 0;
+            var desiredRating = _userSkillRatingRepository.GetByUserIdAndSkillId(user.Id, skill.Id)?.DesiredRating ?? 0;
+            var discrepancy = rating - desiredRating;
+            return discrepancy < 0 ? discrepancy : 0;
+        }
     }
 }

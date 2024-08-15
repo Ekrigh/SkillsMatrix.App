@@ -41,6 +41,6 @@ namespace SkillsMatrix.Infrastructure.Repositories
                          .Include(usr => usr.User)
                          .Include(usr => usr.Skill)
                          .ToListAsync();
-        }
+        } 
     }
 }

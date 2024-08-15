@@ -1,6 +1,7 @@
-﻿<h3>FilterMenu</h3>
+﻿@* @typeparam TModel
+<h3>FilterMenu</h3>
 
-<MudPopover AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+<MudPopover Open="@_filterOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
     <div class="m-2">
 
         <h3>Filter Matrix</h3>
@@ -13,12 +14,38 @@
             <MudToggleItem Value="5" />
             <MudToggleItem Value="6" />
         </MudToggleGroup>
+
+        @foreach (var column in Grid.RenderedColumns)
+        {
+            <MudCheckBox T="bool" Label="@column.Title" Value="@(column.Visible)" @onchange="(e) => ToggleColumnVisibility(column, e.Value)" />
+        }
+        <MudStack Row="true">
+            <MudButton OnClick="@(() => ClearFilterAsync(context))">Clear</MudButton>
+            <MudButton Color="@Color.Primary" OnClick="@(() => ApplyFilterAsync(context))">Filter</MudButton>
+        </MudStack>
     </div>
 </MudPopover>
 
 @code {
+    [Parameter]
+    public MudDataGrid<TModel> Grid { get; set; }
     private IEnumerable<int> _ratings;
+    bool _filterOpen = true;
 
+    private void ToggleColumnVisibility(MudDataGridColumn<TModel> column, bool isVisible)
+    {
+        column.Visible = isVisible;
+        Grid.Refresh(); // Refresh the grid to reflect the changes
+    }
+
+    private async Task ClearFilterAsync(FilterContext<Element> context)
+    {
+        _selectedItems = Elements.ToHashSet();
+        _filterItems = Elements.ToHashSet();
+        _icon = Icons.Material.Outlined.FilterAlt;
+        await context.Actions.ClearFilterAsync(_filterDefinition);
+        _filterOpen = false;
+    }
 
     private string getColor(int rating)
     {
@@ -51,3 +78,4 @@
     }
 
 }
+ *@
