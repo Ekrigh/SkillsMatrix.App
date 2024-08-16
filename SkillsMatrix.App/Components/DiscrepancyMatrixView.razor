@@ -1,0 +1,59 @@
+﻿@inject IUserSkillRatingService userSkillRatingService
+
+<MudDataGrid Class="mt-5 rounded-lg custom-grid" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users" FilterMode="DataGridFilterMode.Simple"
+             Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+    <Columns>
+        <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+            <HeaderTemplate>
+                <MudText><strong>User</strong></MudText>
+            </HeaderTemplate>
+            <FooterTemplate>
+                <MudText Class="sticky-footer"><strong>Total:</strong></MudText>
+            </FooterTemplate>
+        </PropertyColumn>
+
+        @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
+        {
+            <PropertyColumn Property="user => userSkillRatingService.GetDiscrepancy(user, skill)" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))"
+                            AggregateDefinition="_discrepancyAggregation" Sortable="true">
+                <HeaderTemplate>
+                    <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+                        <MudText><strong>@skill.Name</strong></MudText>
+                    </MudTooltip>
+                </HeaderTemplate>
+                <CellTemplate>
+                    @{
+                        var rating = userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result;
+                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
+                        var discrepancy = userSkillRatingService.GetDiscrepancy(context.Item, skill);
+                        string tooltip = $"Rating: {rating}, Desired: {desiredRating}";
+                    }
+                    <MudTooltip Text="@tooltip" Arrow="true" Placement="Placement.Top">
+                        <MudText><strong>@discrepancy</strong></MudText>
+                    </MudTooltip>
+                </CellTemplate>
+            </PropertyColumn>
+        }
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter] public IEnumerable<User> Users { get; set; }
+    [Parameter] public IEnumerable<Skill> Skills { get; set; }
+    [Parameter] public IReadOnlyCollection<Category> _selectedCategories { get; set; }
+    [Parameter] public Func<User, Skill, string> _ratingCellStyleFunc { get; set; }
+    [Parameter] public AggregateDefinition<User> _discrepancyAggregation { get; set; }
+    [Parameter] public Func<User, bool> _quickFilter { get; set; }
+    [Parameter] public EventCallback<MudDataGrid<User>> OnGridReferenceSet { get; set; }
+
+    public MudDataGrid<User> GridReference { get; private set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            OnGridReferenceSet.InvokeAsync(GridReference);
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+}   

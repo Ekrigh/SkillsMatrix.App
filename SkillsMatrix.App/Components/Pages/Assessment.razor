@@ -12,11 +12,12 @@
 else
 {
     <div class="w-100">
-        <BLStepper Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true">
+        <BLStepper Elevation="1" Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true" IntroTitle="Intro" SummaryTitle="Summary">
             <StepTemplate>
                 @category.Name
             </StepTemplate>
             <ContentTemplate>
+
                 <div class="rating-grid">
                     @foreach (var skill in Skills.Where(s => s.CategoryId == category.Id))
                     {
@@ -25,6 +26,19 @@ else
                     }
                 </div>
             </ContentTemplate>
+            <IntroContent>
+                <p>Intro text enzo</p>
+                <p>Lorem ipsum whatever</p>
+            </IntroContent>
+            <SummaryContent>
+                <div class="rating-grid">
+                    @foreach (var skill in Skills)
+                    {
+                        var userSkillRating = GetTempUserSkillRatingForSkill(skill);
+                        <SkillRatingComponent UserSkillRating="userSkillRating" />
+                    }
+                </div>
+            </SummaryContent>
         </BLStepper>
     </div>
 }

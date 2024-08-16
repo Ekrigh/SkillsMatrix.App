@@ -1,0 +1,74 @@
+﻿@using MudBlazor
+@inject IUserSkillRatingService userSkillRatingService
+
+<MudDataGrid Class="mt-5 rounded-lg custom-grid" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users" FilterMode="DataGridFilterMode.Simple"
+             Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+    <Columns>
+        <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+            <FooterTemplate>
+                <MudText><strong>Total:</strong></MudText>
+            </FooterTemplate>
+        </PropertyColumn>
+
+        @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
+        {
+            var titleString = $"{skill.Name} Rating";
+            <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
+                <HeaderTemplate>
+                    <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
+                        <MudText><b>@skill.Name</b></MudText>
+                    </MudTooltip>
+                </HeaderTemplate>
+                <CellTemplate>
+                    <MudTooltip Text="rating" Arrow="true" Placement="Placement.Top">
+                        <MudText><strong>@userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result</strong></MudText>
+                    </MudTooltip>
+                </CellTemplate>
+            </PropertyColumn>
+
+            titleString = $"{skill.Name} Desired Rating";
+            <PropertyColumn Property="user => userSkillRatingService.GetDesiredRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+                <HeaderTemplate />
+                <CellTemplate>
+                    @{
+                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
+                    }
+                    <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
+                        <MudText><strong>@desiredRating</strong></MudText>
+                    </MudTooltip>
+                </CellTemplate>
+            </PropertyColumn>
+
+            titleString = $"{skill.Name} Discrepancy";
+            <PropertyColumn Property="user => userSkillRatingService.GetDiscrepancy(user, skill)" Title="@titleString" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
+                <HeaderTemplate />
+                <CellTemplate>
+                    <MudTooltip Text="Discrepancy" Arrow="true" Placement="Placement.Top">
+                        <MudText><strong>@userSkillRatingService.GetDiscrepancy(context.Item, skill)</strong></MudText>
+                    </MudTooltip>
+                </CellTemplate>
+            </PropertyColumn>
+        }
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter] public IEnumerable<User> Users { get; set; }
+    [Parameter] public IEnumerable<Skill> Skills { get; set; }
+    [Parameter] public IReadOnlyCollection<Category> _selectedCategories { get; set; }
+    [Parameter] public Func<User, Skill, string> _ratingCellStyleFunc { get; set; }
+    [Parameter] public AggregateDefinition<User> _discrepancyAggregation { get; set; }
+    [Parameter] public Func<User, bool> _quickFilter { get; set; }
+    [Parameter] public EventCallback<MudDataGrid<User>> OnGridReferenceSet { get; set; }
+
+    public MudDataGrid<User> GridReference { get; private set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            OnGridReferenceSet.InvokeAsync(GridReference);
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+}

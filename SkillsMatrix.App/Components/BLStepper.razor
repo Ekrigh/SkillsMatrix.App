@@ -18,6 +18,21 @@
         </div>
 
         <div class="bl-steps-container">
+            @if (IntroContent is not null)
+            {
+                <div class="bl-step @GetClass(0)" @onclick="@(() => StepClick(0))">
+                    <div class="bl-step-content">
+                        <span class="bl-step-dot">
+                            <MudIcon Icon="@Icons.Material.Filled.Check" />
+                        </span>
+                        <span class="bl-step-text">
+                            @IntroTitle
+                        </span>
+                    </div>
+                    <div class="bl-step-line"></div>
+                </div>
+            }
+
             @foreach (var item in Items)
             {
 
@@ -36,41 +51,72 @@
                     <div class="bl-step-line"></div>
                 </div>
             }
-        </div>
-        <div class="bl-tabs-container">
-            @foreach (var item in Items)
+
+            @if (SummaryContent is not null)
             {
-                @if (Items.ToList().FindIndex(c => c.Equals(item)) == ActiveIndex)
-                {               
-                    <MudCard Elevation="0">
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                @if (StepTemplate is not null)
-                                {
-                                    @StepTemplate(item)
-                                }
-                            </CardHeaderContent>
-                           <CardHeaderActions>
-                                <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == 0)" OnClick="Previous">
-                                    @(!string.IsNullOrEmpty(PreviousText) ? PreviousText : "Previous")
-                                </MudButton>
-                                <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == Items.ToList().Count() - 1)" OnClick="Next">
-                                    @(!string.IsNullOrEmpty(NextText) ? NextText : "Next")
-                                </MudButton>
-                           </CardHeaderActions>
-                        </MudCardHeader>
-                        <MudCardContent>
-                            <MudText>
-                                @if (ContentTemplate is not null)
-                                {
-                                    @ContentTemplate(item)
-                                }
-                            </MudText>
-                        </MudCardContent>
-                    </MudCard>
-                }
+                <div class="bl-step">
+                    <div class="bl-step @GetClass(TotalItems)" @onclick="@(() => StepClick(TotalItems))">
+                        <div class="bl-step-content">
+                            <span class="bl-step-dot">
+                                <MudIcon Icon="@Icons.Material.Filled.Check" />
+                            </span>
+                            <span class="bl-step-text">
+                                @SummaryTitle
+                            </span>
+                        </div>
+                        <div class="bl-step-line"></div>
+                    </div>
+                </div>
             }
         </div>
+
+        @if (IntroContent is not null || SummaryContent is not null || CurrentItem is not null)
+        {
+            <div class="bl-tabs-container">
+                <MudCard Elevation="@Elevation">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            @if (ActiveIndex == 0 && IntroContent is not null)
+                            {
+                                @IntroTitle
+                            }
+                            else if (CurrentItem != null && StepTemplate is not null)
+                            {
+                                @StepTemplate(CurrentItem)
+                            }
+                            else if (ActiveIndex == TotalItems && SummaryContent is not null)
+                            {
+                                @SummaryTitle
+                            }
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == 0)" OnClick="Previous">
+                                @(!string.IsNullOrEmpty(PreviousText) ? PreviousText : "Previous")
+                            </MudButton>
+                            <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == TotalItems)" OnClick="Next">
+                                @(!string.IsNullOrEmpty(NextText) ? NextText : "Next")
+                            </MudButton>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>
+                            @if (ActiveIndex == 0 && IntroContent is not null)
+                            {
+                                @IntroContent
+                            }
+                            else if (CurrentItem != null && ContentTemplate is not null)
+                            {
+                                @ContentTemplate(CurrentItem)
+                            }
+                            else if (ActiveIndex == (TotalItems) && SummaryContent is not null)
+                            {
+                                @SummaryContent
+                            }
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+        }
     </div>
 }
 
@@ -79,29 +125,57 @@
     public RenderFragment<TItem>? StepTemplate { get; set; }
     [Parameter]
     public RenderFragment<TItem>? ContentTemplate { get; set; }
+    [Parameter]
+    public RenderFragment? IntroContent { get; set; }
+    [Parameter]
+    public RenderFragment? SummaryContent { get; set; }
 
     [Parameter]
     public bool AllowStepClick { get; set; }
 
+    private List<TItem> _items { get; set; } = new();
     [Parameter]
-    public IReadOnlyList<TItem> Items { get; set; }
+    public IReadOnlyList<TItem> Items
+    {
+        get => _items;
+        set
+        {
+            if (_items == value) return;
+            _items = value.ToList();
+        }
+    }
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public string? Title { get; set; }
     [Parameter] public string? SaveText { get; set; }
     [Parameter] public string? NextText { get; set; }
     [Parameter] public string? PreviousText { get; set; }
+    [Parameter] public string? IntroTitle { get; set; }
+    [Parameter] public string? SummaryTitle { get; set; }
+    [Parameter] public int Elevation { get; set; } = 0;
+    private int TotalItems { get; set; }
+    private TItem? CurrentItem { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        SetTotalItems();
+    }
 
     public int ActiveIndex { get; set; } = 0;
 
     private string GetClass(TItem item)
     {
-        var currentIndex = Items.ToList().FindIndex(c => c.Equals(item));
+        return GetClass(GetIndex(item));
 
-        if (currentIndex == ActiveIndex)
+    }
+
+    private string GetClass(int index)
+    {
+        if (index == ActiveIndex)
         {
             return "bl-step-active";
         }
-        else if (currentIndex < ActiveIndex)
+        else if (index < ActiveIndex)
         {
             return "bl-step-ready";
         }
@@ -115,26 +189,34 @@
         {
             ActiveIndex -= 1;
         }
+
+        SetCurrentItem();
     }
 
     private void Next()
     {
-        if (ActiveIndex != Items.ToList().Count() - 1)
+        if (ActiveIndex != TotalItems)
         {
             ActiveIndex += 1;
         }
+
+        SetCurrentItem();
     }
 
     private void StepClick(TItem item)
     {
-        var currentIndex = Items.ToList().FindIndex(c => c.Equals(item));
+        StepClick(GetIndex(item));
+    }
 
-        if (currentIndex > ActiveIndex && !AllowStepClick)
+    private void StepClick(int index)
+    {
+        if (index > ActiveIndex && !AllowStepClick)
         {
             return;
         }
 
-        ActiveIndex = Items.ToList().FindIndex(c => c.Equals(item));
+        ActiveIndex = index;
+        SetCurrentItem();
     }
 
     public void OnSaveCallback()
@@ -144,6 +226,40 @@
 
     private bool AllowSave()
     {
-        return ActiveIndex != Items.ToList().Count() - 1;
+        return ActiveIndex != TotalItems;
+    }
+
+    private int GetIndex(TItem item)
+    {
+        var index = _items.FindIndex(c => c.Equals(item));
+
+        if (IntroContent is not null) index++;
+        return index;
+    }
+
+    private void SetTotalItems()
+    {
+        var total = _items.Count() - 1;
+
+        if (IntroContent is not null) total++;
+
+        if (SummaryContent is not null) total++;
+
+        TotalItems = total;
+    }
+
+    private void SetCurrentItem()
+    {
+        var itemIndex = ActiveIndex;
+
+        if (IntroContent is not null) itemIndex--;
+
+        if (itemIndex >= 0 && itemIndex != (TotalItems - 1))
+        {
+            CurrentItem = _items[itemIndex];
+        } else
+        {
+            CurrentItem = default(TItem);
+        }
     }
 }
