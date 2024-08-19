@@ -3,7 +3,7 @@
 @inject ISkillService skillService
 @inject ICategoryService categoryService
 @inject IUserSkillRatingService userSkillRatingService
-
+<MudOverlay @bind-Visible="columnsMenuOpen" AutoClose="true" />
 @* Makes sortdirection icon visible *@
 <style>
     .custom-grid .mud-table-cell .column-header .column-options .sort-direction-icon,
@@ -31,19 +31,26 @@ else
             </MudChipSet>
             <MudSpacer />
             <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
-            <MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="@(() => ShowColumnsMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
-            <MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="@(() => ClearGridFiltersAsync(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
+            <div style="display:inline-block">
+                <MudIconButton Color="Color.Secondary" Icon="@columnFilterIcon" OnClick="@(() => ToggleColumnsMenu())" />
+                <MudPopover Open="@columnsMenuOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                    <ColumnsMenu IsOpen="@columnsMenuOpen" IsOpenChanged="ToggleColumnsMenu" Skills="@Skills" Categories="@Categories" SelectedCategories="@_selectedCategories.ToList()" FilteredSkills="FilteredSkills" />
+                </MudPopover>
+            </div>
             <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 
+        @{
+            var SkillsToRender = FilteredSkills.Count > 0 ? FilteredSkills : Skills;
+        }
         @if (detailedViewBox)
         {
-            <DetailedDiscrepancyMatrixView Users="@Users" Skills="@Skills" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => detailedDiscrepancyMatrixGrid = grid" />
+            <DetailedDiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => detailedDiscrepancyMatrixGrid = grid" />
         }
         else
         {
-           <DiscrepancyMatrixView Users="@Users" Skills="@Skills" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => discrepancyMatrixGrid = grid" />
+            <DiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => discrepancyMatrixGrid = grid" />
         }
     </div>
 }
@@ -51,6 +58,7 @@ else
 @code {
     private IEnumerable<User> Users { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
+    private List<Skill> FilteredSkills { get; set; } = new();
     private IEnumerable<Category> Categories { get; set; }
     private IReadOnlyCollection<Category> _selectedCategories = new List<Category>();
     private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
@@ -58,6 +66,8 @@ else
     private MudDataGrid<User> discrepancyMatrixGrid;
     private string _searchString;
     public bool detailedViewBox { get; set; } = false;
+    private string columnFilterIcon = @Icons.Material.Outlined.FilterAlt;
+    bool columnsMenuOpen = false;
     private AggregateDefinition<User> _discrepancyAggregation = new AggregateDefinition<User>
         {
             Type = AggregateType.Sum,
@@ -106,19 +116,10 @@ else
         return style;
     };
 
-    private async Task ClearGridFiltersAsync(MudDataGrid<User> datagrid)
+    private void ToggleColumnsMenu()
     {
-        await datagrid.ClearFiltersAsync();
-
-        foreach (var column in datagrid.RenderedColumns)
-        {
-            await column.ShowAsync();
-        }
-    }
-
-    private void ShowColumnsMenu(MudDataGrid<User> datagrid)
-    {
-        datagrid.ShowColumnsPanel();
+        columnsMenuOpen = !columnsMenuOpen;
+        columnFilterIcon = FilteredSkills.Count() == 0 ? @Icons.Material.Outlined.FilterAlt : @Icons.Material.Filled.FilterAlt;
     }
 
     private void ShowFilterMenu(MudDataGrid<User> datagrid)

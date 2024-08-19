@@ -9,7 +9,6 @@
 }
 else
 {
-    <div class="m-5">
         <MudDataGrid Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@Users"
                      Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false">
             <Columns>
@@ -26,7 +25,6 @@ else
                 }
             </Columns>
         </MudDataGrid>
-    </div>
 }
 
 @code {
@@ -59,7 +57,6 @@ else
         int? rating = (user == SkillsLevel) ? 
         TempUserSkillRatingsByUser.FirstOrDefault(usrByUser => usrByUser.SkillId == usr.SkillId).Rating :
         TempUserSkillRatingsByUser.FirstOrDefault(usrByUser => usrByUser.SkillId == usr.SkillId).DesiredRating;
-        //int? rating = userSkillRatingService.GetRating(user.Id, usr.SkillId).Result;
 
         switch (rating)
         {

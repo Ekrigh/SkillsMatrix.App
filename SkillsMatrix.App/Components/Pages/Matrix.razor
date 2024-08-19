@@ -23,7 +23,7 @@ else
             <MudSpacer />
             <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="ShowFilterMenu" />
             <div style="display:inline-block">
-                <MudIconButton Color="Color.Secondary" Icon="@filterIcon" OnClick="ToggleColumnsMenu" />
+                <MudIconButton Color="Color.Secondary" Icon="@columnFilterIcon" OnClick="ToggleColumnsMenu" />
                 <MudPopover Open="@columnsMenuOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
                     <ColumnsMenu IsOpen="@columnsMenuOpen" IsOpenChanged="ToggleColumnsMenu" Skills="@Skills" Categories="@Categories" SelectedCategories="@_selectedCategories.ToList()" FilteredSkills="FilteredSkills" />
                 </MudPopover>
@@ -66,8 +66,8 @@ else
     private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
     private MudDataGrid<User> matrixGrid;
     private string _searchString;
-    private string filterIcon = @Icons.Material.Outlined.FilterAlt;
     private IReadOnlyCollection<Category> _selectedCategories = new List<Category>();
+    private string columnFilterIcon = @Icons.Material.Outlined.FilterAlt;
     bool columnsMenuOpen = false;
 
     private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
@@ -124,7 +124,7 @@ else
     private void ToggleColumnsMenu() 
     {
         columnsMenuOpen = !columnsMenuOpen;
-        filterIcon = FilteredSkills.Count() == 0 ? @Icons.Material.Outlined.FilterAlt : @Icons.Material.Filled.FilterAlt;
+        columnFilterIcon = FilteredSkills.Count() == 0 ? @Icons.Material.Outlined.FilterAlt : @Icons.Material.Filled.FilterAlt;
     }
 
     private void ShowFilterMenu()
