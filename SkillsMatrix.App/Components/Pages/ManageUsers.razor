@@ -15,7 +15,7 @@
         <InputText id="Email" @bind-Value="User.Email" class="form-control" />
         <ValidationMessage For="() => User.Email" />
         <div class="mt-5">
-            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Add User</MudButton>
+            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary">Add User</MudButton>
             <MudButton Disabled="@_processing" @onclick="DeleteUser">Delete</MudButton>
         </div>
         @if (!string.IsNullOrEmpty(ErrorMessage))

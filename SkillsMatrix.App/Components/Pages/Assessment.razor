@@ -5,14 +5,14 @@
 @inject ISkillService skillService
 @inject ISnackbar Snackbar
 
-@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatings == null || !UserSkillRatings.Any()))
+@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatingsByUser == null || !UserSkillRatingsByUser.Any()))
 {
     <p>Loading...</p>
 }
 else
 {
     <div class="w-100">
-        <BLStepper Elevation="1" Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true" IntroTitle="Intro" SummaryTitle="Summary">
+        <BLStepper Elevation="1" Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true" IntroTitle="Introduction" SummaryTitle="Summary">
             <StepTemplate>
                 @category.Name
             </StepTemplate>
@@ -27,17 +27,19 @@ else
                 </div>
             </ContentTemplate>
             <IntroContent>
-                <p>Intro text enzo</p>
-                <p>Lorem ipsum whatever</p>
+                <MudText>
+                    <h4>Welcome to the Skills Assessment</h4>
+                    During the skills assessment you will enter your current skill level, and your interest level in potentially learning this skill.<br />
+                    For each categorie you will find different skills. The skills are divided in categories to make it easier to assess. <br />
+                    You can go back to already filled in skills while doing the assessment or retake the assessment at a later point in time.
+                </MudText>
             </IntroContent>
             <SummaryContent>
-                <div class="rating-grid">
-                    @foreach (var skill in Skills)
-                    {
-                        var userSkillRating = GetTempUserSkillRatingForSkill(skill);
-                        <SkillRatingComponent UserSkillRating="userSkillRating" />
-                    }
-                </div>
+                <MudText>
+                    <h4>Skills assessment done</h4>
+                    All the categories have been walked through. Below you will find a summary from your selected levels per skill.
+                </MudText>
+                <Summary CurrentUser="currentUser" TempUserSkillRatingsByUser="TempUserRatings" />
             </SummaryContent>
         </BLStepper>
     </div>
@@ -47,7 +49,7 @@ else
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
-    private List<UserSkillRating> UserSkillRatings { get; set; } = new();
+    private List<UserSkillRating> UserSkillRatingsByUser { get; set; } = new();
     private List<UserSkillRating> TempUserRatings { get; set; } = new();
     private bool _processing = false;
 
@@ -55,9 +57,9 @@ else
     {
         currentUser = await userService.GetById(12);
         Categories = await categoryService.GetAll();
-        UserSkillRatings = await userSkillRatingService.GetAllByUserId(currentUser.Id);
+        UserSkillRatingsByUser = await userSkillRatingService.GetAllByUserId(currentUser.Id);
         Skills = await skillService.GetAll();
-        TempUserRatings = CreateDeepCopy(UserSkillRatings.Where(usr => Skills.Any(skill => skill.Id == usr.SkillId)).ToList());
+        TempUserRatings = CreateDeepCopy(UserSkillRatingsByUser.Where(usr => Skills.Any(skill => skill.Id == usr.SkillId)).ToList());
     }
 
     private async Task HandleValidSubmit()
@@ -66,22 +68,22 @@ else
         foreach (var tempUserSkillRating in TempUserRatings)
         {
             tempUserSkillRating.LastUpdated = DateTime.Now;
-            var originalRating = UserSkillRatings.FirstOrDefault(usr => usr.SkillId == tempUserSkillRating.SkillId);
+            var originalRating = UserSkillRatingsByUser.FirstOrDefault(usr => usr.SkillId == tempUserSkillRating.SkillId);
             if (originalRating != null && (originalRating.Rating != tempUserSkillRating.Rating || originalRating.DesiredRating != tempUserSkillRating.DesiredRating))
             {
                 originalRating.Rating = tempUserSkillRating.Rating;
                 originalRating.DesiredRating = tempUserSkillRating.DesiredRating;
                 originalRating.LastUpdated = DateTime.Now;
             }
-            else if(originalRating == null)
+            else if (originalRating == null)
             {
-                UserSkillRatings.Add(tempUserSkillRating);
+                UserSkillRatingsByUser.Add(tempUserSkillRating);
             }
         }
 
         currentUser.LastSurvey = DateTime.Now;
 
-        await userSkillRatingService.AddAll(UserSkillRatings);
+        await userSkillRatingService.AddAll(UserSkillRatingsByUser);
         Snackbar.Add("Ratings saved", Severity.Success, config =>
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;

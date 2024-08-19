@@ -20,19 +20,19 @@ else
 {
     <div class="m-5">
         <h3 class="ml-1">Discrepancymatrix</h3>
-        <MudCheckBox Class="ml-n2" @bind-Value="detailedViewBox" Label="Detailed view"></MudCheckBox>
+        <MudCheckBox Class="ml-n2" Color="Color.Info" UncheckedColor="Color.Default" @bind-Value="detailedViewBox" Label="Detailed view"></MudCheckBox>
         <div Class="d-flex">
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
-                <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
+                <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Info" />
                 @foreach (var category in Categories)
                 {
-                    <MudChip Value="@category" Text="@category.Name" Variant="Variant.Outlined" SelectedColor="Color.Primary" />
+                    <MudChip Value="@category" Text="@category.Name" Variant="Variant.Outlined" SelectedColor="Color.Info" />
                 }
             </MudChipSet>
             <MudSpacer />
-            <MudIconButton Class="ml-3" Color="Color.Primary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
-            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="@(() => ShowColumnsMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
-            <MudIconButton Color="Color.Primary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="@(() => ClearGridFiltersAsync(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
+            <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
+            <MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Outlined.FilterAlt" OnClick="@(() => ShowColumnsMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
+            <MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Outlined.FilterAltOff" OnClick="@(() => ClearGridFiltersAsync(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
             <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>

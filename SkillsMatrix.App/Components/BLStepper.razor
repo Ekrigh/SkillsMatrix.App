@@ -10,7 +10,7 @@
             <div class="bl-stepper-header-actions">
                 @if (OnSave.HasDelegate)
                 {
-                    <MudButton Variant="@Variant.Filled" Disabled="AllowSave()" OnClick="OnSaveCallback" Color="@Color.Primary">
+                    <MudButton Variant="@Variant.Filled" Disabled="AllowSave()" OnClick="OnSaveCallback" Color="@Color.Secondary">
                         @(!string.IsNullOrEmpty(SaveText) ? SaveText : "Save")
                     </MudButton>
                 }

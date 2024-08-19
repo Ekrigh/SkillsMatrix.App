@@ -1,0 +1,90 @@
+﻿@inject IUserService userService
+@inject ISkillService skillService
+@inject ICategoryService categoryService
+@inject IUserSkillRatingService userSkillRatingService
+
+@if ((Users == null || !Users.Any()))
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="m-5">
+        <MudDataGrid Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@Users"
+                     Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false">
+            <Columns>
+                <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" Filterable="false">
+                    <HeaderTemplate>
+                        <MudText><strong>User</strong></MudText>
+                    </HeaderTemplate>
+                </PropertyColumn>
+
+                @foreach (var userSkillRating in TempUserSkillRatingsByUser)
+                {
+                    <PropertyColumn Property="user => (user == SkillsLevel) ? userSkillRating.Rating : userSkillRating.DesiredRating" Title="@userSkillRating.Skill.Name"
+                                    FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, userSkillRating))" />
+                }
+            </Columns>
+        </MudDataGrid>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public User CurrentUser { get; set; }
+    [Parameter]
+    public IEnumerable<UserSkillRating> TempUserSkillRatingsByUser { get; set; }
+    private List<User> Users { get; set; } = new List<User>();
+    private User SkillsLevel = new User()
+        {
+            Name = "Skills Level"
+        };
+    private User InterestLevel = new User()
+        {
+            Name = "Interest Level"
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentUser = await userService.GetById(12);
+        SkillsLevel.UserSkillRatings = CurrentUser.UserSkillRatings;
+        InterestLevel.UserSkillRatings = CurrentUser.UserSkillRatings;
+        Users.Add(SkillsLevel);
+        Users.Add(InterestLevel);
+    }
+
+    private Func<User, UserSkillRating, string> _ratingCellStyleFunc => (user, usr) =>
+    {
+        string style = "font-weight:bold; text-align:center";
+        int? rating = (user == SkillsLevel) ? 
+        TempUserSkillRatingsByUser.FirstOrDefault(usrByUser => usrByUser.SkillId == usr.SkillId).Rating :
+        TempUserSkillRatingsByUser.FirstOrDefault(usrByUser => usrByUser.SkillId == usr.SkillId).DesiredRating;
+        //int? rating = userSkillRatingService.GetRating(user.Id, usr.SkillId).Result;
+
+        switch (rating)
+        {
+            case 1:
+                style += ";background-color:#E94B41CC";
+                break;
+            case 2:
+                style += ";background-color:#F28724CC";
+                break;
+            case 3:
+                style += ";background-color:#F2C024CC";
+                break;
+            case 4:
+                style += ";background-color:#D1E329CC";
+                break;
+            case 5:
+                style += ";background-color:#9CD751CC";
+                break;
+            case 6:
+                style += ";background-color:#75C13CCC";
+                break;
+            default:
+                style += ";background-color:#FCFCFC";
+                break;
+        }
+        return style;
+    };
+}

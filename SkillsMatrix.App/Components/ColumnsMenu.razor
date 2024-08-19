@@ -1,25 +1,91 @@
-﻿@* @typeparam TModel
-<h3>FilterMenu</h3>
-
-<MudPopover Open="@_filterOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-    <div class="m-2">
-
-        <h3>Show or Hide skills</h3>
-
-        @foreach (var skill in Skills)
+﻿<div class="m-3" style="width:504px">
+    <h4>Show or Hide skills</h4>
+    @{
+        var CategoriesToLoop = SelectedCategories.Count != 0 ? SelectedCategories : Categories;
+    }
+    <div style="max-height:504px; overflow:auto">
+        @foreach (var category in CategoriesToLoop.Where(category => category.ParentCategoryId != null))
+    {
+        <MudText Class="mt-3"><Strong>@category.Name</Strong></MudText>
+        <div class="filter-grid">
+        @foreach (var skill in Skills.Where(s => s.CategoryId == category.Id))
         {
-            <MudCheckBox T="bool" Label="@skill.Name" Value="true" @onchange="(e) => ToggleColumnVisibility(column, e.Value)" />
+                    <MudCheckBox Dense="true" Color="Color.Info" UncheckedColor="Color.Default" T="bool" Value="@TempFilteredSkills.Contains(skill)" Size="Size.Small" Label="@skill.Name" ValueChanged="(isChecked) => OnSkillCheckedChanged(skill, isChecked)" />
         }
-        <MudStack Row="true">
-            <MudButton OnClick="@(() => ClearFilterAsync(context))">Clear</MudButton>
-            <MudButton Color="@Color.Primary" OnClick="@(() => ApplyFilterAsync(context))">Filter</MudButton>
-        </MudStack>
+        </div>
+    }
     </div>
-</MudPopover>
+    <MudStack Class="mt-5" Row="true">
+        <MudButton Disabled="@_processing" OnClick="@(() => ClearFilters())"><span class="secondary-color text-no-transform">Reset filters</span></MudButton>
+        <MudSpacer/>
+        <MudButton OnClick="@(() => Cancel())"><span class="secondary-color text-no-transform">Cancel</span></MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => ApplyFilter())"><span class="text-no-transform">Filter skills</span></MudButton>
+    </MudStack>
+</div>
 
 @code {
     [Parameter]
     public IEnumerable<Skill> Skills { get; set; }
-    public IEnumerable<Skill> filteredSkills { get; set; }
-    bool _filterOpen = true;
-} *@
+    [Parameter]
+    public IEnumerable<Category> Categories { get; set; }
+    [Parameter]
+    public List<Category> SelectedCategories { get; set; }
+    [Parameter]
+    public List<Skill> FilteredSkills { get; set; } = new();
+    public List<Skill> TempFilteredSkills { get; set; } = new();
+    [Parameter]
+    public bool IsOpen { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+    private bool _processing = false;
+
+    protected override void OnParametersSet()
+    {
+        TempFilteredSkills.AddRange(FilteredSkills);
+    }
+
+    private void OnSkillCheckedChanged(Skill skill, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!TempFilteredSkills.Contains(skill))
+            {
+                TempFilteredSkills.Add(skill);
+            }
+        }
+        else
+        {
+            if (TempFilteredSkills.Contains(skill))
+            {
+                TempFilteredSkills.Remove(skill);
+            }
+        }
+    }
+
+    private async Task ClearFilters()
+    {
+        FilteredSkills.Clear();
+        await IsOpenChanged.InvokeAsync();
+    }
+
+    private async Task ApplyFilter()
+    {
+        _processing = true;
+        FilteredSkills.Clear();
+        foreach (var tempSkill in TempFilteredSkills)
+        {
+            var originalSkill = FilteredSkills.FirstOrDefault(Skill => Skill.Id == tempSkill.Id);
+            if (originalSkill == null)
+            {
+                FilteredSkills.Add(tempSkill);
+            }
+        }
+        _processing = false;
+        await IsOpenChanged.InvokeAsync();
+    }
+
+    private async Task Cancel()
+    {
+        await IsOpenChanged.InvokeAsync();
+    }
+}

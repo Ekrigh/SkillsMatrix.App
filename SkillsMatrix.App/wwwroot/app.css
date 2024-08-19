@@ -50,8 +50,16 @@ h1:focus {
     border-color: #929292;
 }
 
+.secondary-color {
+    color: var(--mud-palette-secondary);
+}
+
 .bl-blue-500 {
-    background-color: #0d3a52;
+    color: #0d3a52;
+}
+
+.text-no-transform {
+    text-transform: none;
 }
 
 .chipMenu {
@@ -68,7 +76,11 @@ h1:focus {
     opacity: 1 !important;
 }
 
-
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0px;
+}
 
 .rating-grid {
     display: grid;
