@@ -24,7 +24,7 @@ else
         <div Class="d-flex">
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
                 <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Info" />
-                @foreach (var category in Categories)
+                @foreach (var category in Categories.Where(category => category.ParentCategoryId != null))
                 {
                     <MudChip Value="@category" Text="@category.Name" Variant="Variant.Outlined" SelectedColor="Color.Info" />
                 }

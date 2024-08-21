@@ -12,7 +12,7 @@
 else
 {
     <div class="w-100">
-        <BLStepper Elevation="1" Items="Categories.ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true" IntroTitle="Introduction" SummaryTitle="Summary">
+        <BLStepper Elevation="1" Items="Categories.Where(category => category.ParentCategoryId != null).ToList()" Context="category" Title="Skills Assessment" SaveText="Save Assessment" OnSave="HandleValidSubmit" AllowStepClick="true" IntroTitle="Introduction" SummaryTitle="Summary">
             <StepTemplate>
                 @category.Name
             </StepTemplate>
@@ -86,7 +86,7 @@ else
         await userSkillRatingService.AddAll(UserSkillRatingsByUser);
         Snackbar.Add("Ratings saved", Severity.Success, config =>
         {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomCenter;
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopRight;
         });
         _processing = false;
     }

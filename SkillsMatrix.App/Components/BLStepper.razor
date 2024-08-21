@@ -1,7 +1,8 @@
 ﻿@typeparam TItem
 
 
-@if (Items != null) {
+@if (Items != null)
+{
     <div class="bl-stepper">
         <div class="bl-stepper-header">
             <div class="bl-stepper-header-title">
@@ -42,7 +43,7 @@
                             <MudIcon Icon="@Icons.Material.Filled.Check" />
                         </span>
                         <span class="bl-step-text">
-                            @if(StepTemplate is not null)
+                            @if (StepTemplate is not null)
                             {
                                 @StepTemplate(item)
                             }
@@ -54,7 +55,6 @@
 
             @if (SummaryContent is not null)
             {
-                <div class="bl-step">
                     <div class="bl-step @GetClass(TotalItems)" @onclick="@(() => StepClick(TotalItems))">
                         <div class="bl-step-content">
                             <span class="bl-step-dot">
@@ -66,7 +66,6 @@
                         </div>
                         <div class="bl-step-line"></div>
                     </div>
-                </div>
             }
         </div>
 
@@ -74,35 +73,39 @@
         {
             <div class="bl-tabs-container">
                 <MudCard Elevation="@Elevation">
+                    @if (ActiveIndex != 0 && ActiveIndex != TotalItems)
+                    {
                     <MudCardHeader>
+                        
                         <CardHeaderContent>
-                            @if (ActiveIndex == 0 && IntroContent is not null)
+                            @if (CurrentItem != null && StepTemplate is not null)
                             {
-                                @IntroTitle
-                            }
-                            else if (CurrentItem != null && StepTemplate is not null)
-                            {
-                                @StepTemplate(CurrentItem)
-                            }
-                            else if (ActiveIndex == TotalItems && SummaryContent is not null)
-                            {
-                                @SummaryTitle
+                            @StepTemplate(CurrentItem)
                             }
                         </CardHeaderContent>
+                        
                         <CardHeaderActions>
+                            
                             <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == 0)" OnClick="Previous">
                                 @(!string.IsNullOrEmpty(PreviousText) ? PreviousText : "Previous")
                             </MudButton>
                             <MudButton Variant="@Variant.Outlined" Color="@Color.Primary" Disabled="@(ActiveIndex == TotalItems)" OnClick="Next">
                                 @(!string.IsNullOrEmpty(NextText) ? NextText : "Next")
                             </MudButton>
+                            
                         </CardHeaderActions>
+                        
+                        
                     </MudCardHeader>
+                    }
                     <MudCardContent>
                         <MudText>
                             @if (ActiveIndex == 0 && IntroContent is not null)
                             {
                                 @IntroContent
+                                <MudButton Class="mt-5" Variant="Variant.Filled" Color="@Color.Secondary" Disabled="@(ActiveIndex == TotalItems)" OnClick="Next">
+                                    @(!string.IsNullOrEmpty(NextText) ? NextText : "Start Assessment")
+                                </MudButton>
                             }
                             else if (CurrentItem != null && ContentTemplate is not null)
                             {
@@ -257,7 +260,8 @@
         if (itemIndex >= 0 && itemIndex != (TotalItems - 1))
         {
             CurrentItem = _items[itemIndex];
-        } else
+        }
+        else
         {
             CurrentItem = default(TItem);
         }
