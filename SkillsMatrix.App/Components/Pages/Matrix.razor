@@ -4,6 +4,7 @@
 @inject ICategoryService categoryService
 @inject IUserSkillRatingService userSkillRatingService
 <MudOverlay @bind-Visible="columnsMenuOpen" AutoClose="true" />
+<MudOverlay @bind-Visible="peopleFinderOpen" AutoClose="true" />
 @if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
 {
     <p>Loading...</p>
@@ -11,7 +12,7 @@
 else
 {
     <div class="m-5">
-        <h3 class="ml-1">Skillsmatrix</h3>
+        <h4 class="ml-1">Skillsmatrix</h4>
         <div Class="d-flex">
             <MudChipSet Class="chipMenu" T="Category" SelectionMode="SelectionMode.MultiSelection" @bind-SelectedValues="_selectedCategories">
                 <MudChip Style="min-width:80px" Selected="!_selectedCategories.Any()" T="string" OnClick="ShowAllSkills" Text="All Skills" Variant="Variant.Outlined" SelectedColor="Color.Info" />
@@ -21,7 +22,12 @@ else
                 }
             </MudChipSet>
             <MudSpacer />
-            <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="ShowFilterMenu" />
+            <div style="display:inline-block">
+                <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@peopleFinderIcon" OnClick="TogglePeopleFinder" />
+            <MudPopover Open="@peopleFinderOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                    <PeopleFinder IsOpen="@peopleFinderOpen" IsOpenChanged="TogglePeopleFinder" Skills="@Skills" Users="@Users" FilteredUsers="@FilteredUsers" PeopleFinderFilters="@PeopleFinderFilters" />
+            </MudPopover>
+            </div>
             <div style="display:inline-block">
                 <MudIconButton Color="Color.Secondary" Icon="@columnFilterIcon" OnClick="ToggleColumnsMenu" />
                 <MudPopover Open="@columnsMenuOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
@@ -32,7 +38,7 @@ else
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 
-        <MudDataGrid @ref="matrixGrid" Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@Users"
+        <MudDataGrid @ref="matrixGrid" Class="mt-5 rounded-lg" FilterMode="DataGridFilterMode.Simple" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@FilteredUsers"
                      Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
             <Columns>
                 <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false" Filterable="false">
@@ -48,7 +54,7 @@ else
                     <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id).Result" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                         <HeaderTemplate>
                             <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
-                                <MudText><b>@skill.Name</b></MudText>
+                                <MudText><strong>@skill.Name</strong></MudText>
                             </MudTooltip>
                         </HeaderTemplate>
                     </PropertyColumn>
@@ -60,6 +66,8 @@ else
 
 @code {
     private IEnumerable<User> Users { get; set; }
+    private List<User> FilteredUsers { get; set; }
+    private List<PeopleFinderFilter> PeopleFinderFilters { get; set; } = new();
     private IEnumerable<Skill> Skills { get; set; }
     private List<Skill> FilteredSkills { get; set; } = new();
     private IEnumerable<Category> Categories { get; set; }
@@ -68,7 +76,9 @@ else
     private string _searchString;
     private IReadOnlyCollection<Category> _selectedCategories = new List<Category>();
     private string columnFilterIcon = @Icons.Material.Outlined.FilterAlt;
+    private string peopleFinderIcon = @Icons.Material.Outlined.PersonSearch;
     bool columnsMenuOpen = false;
+    bool peopleFinderOpen = false;
 
     private AggregateDefinition<User> _ratingAggregation = new AggregateDefinition<User>
         {
@@ -87,6 +97,7 @@ else
         Skills = await skillService.GetAll();
         Categories = await categoryService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAll();
+        FilteredUsers = Users.ToList();
     }
 
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
@@ -121,10 +132,16 @@ else
         return style;
     };
 
-    private void ToggleColumnsMenu() 
+    private void ToggleColumnsMenu()
     {
         columnsMenuOpen = !columnsMenuOpen;
         columnFilterIcon = FilteredSkills.Count() == 0 ? @Icons.Material.Outlined.FilterAlt : @Icons.Material.Filled.FilterAlt;
+    }
+
+    private void TogglePeopleFinder()
+    {
+        peopleFinderOpen = !peopleFinderOpen;
+        peopleFinderIcon = FilteredUsers.Count() == Users.Count() ? @Icons.Material.Outlined.PersonSearch : @Icons.Material.Filled.PersonSearch;
     }
 
     private void ShowFilterMenu()
@@ -136,7 +153,6 @@ else
     {
         _selectedCategories = new List<Category>();
     }
-
 }
 
 

@@ -64,24 +64,19 @@
 
     private async Task ClearFilters()
     {
+        _processing = true;
         FilteredSkills.Clear();
         await IsOpenChanged.InvokeAsync();
+        _processing = false;
     }
 
     private async Task ApplyFilter()
     {
         _processing = true;
         FilteredSkills.Clear();
-        foreach (var tempSkill in TempFilteredSkills)
-        {
-            var originalSkill = FilteredSkills.FirstOrDefault(Skill => Skill.Id == tempSkill.Id);
-            if (originalSkill == null)
-            {
-                FilteredSkills.Add(tempSkill);
-            }
-        }
-        _processing = false;
+        FilteredSkills.AddRange(TempFilteredSkills);
         await IsOpenChanged.InvokeAsync();
+        _processing = false;
     }
 
     private async Task Cancel()

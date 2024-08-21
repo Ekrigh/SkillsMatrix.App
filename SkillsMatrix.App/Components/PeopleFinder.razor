@@ -1,0 +1,99 @@
+﻿<div class="m-3" style="width:590px">
+    <h5>Peoplefinder</h5>
+
+    <div style="max-height:504px; overflow:auto">
+        @foreach (var tempPeopleFinderFilter in TempPeopleFinderFilters)
+        {
+            <div class="d-flex gap-2">
+                <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="() => RemoveFilter(tempPeopleFinderFilter)" Color="Color.Secondary">Remove</MudIconButton>
+                <MudText Class="text-nowrap align-self-center"><strong>Skilled in</strong></MudText>
+                <MudAutocomplete T="Skill" @bind-Value="tempPeopleFinderFilter.Skill" Label="Select Skill" SearchFunc="@SearchSkill" ToStringFunc="@(skill => skill==null?null: $"{skill.Name}")" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" />
+                <MudText Class="text-nowrap align-self-center"><strong>With at least a level of</strong></MudText>
+                <MudNumericField T="int" @bind-Value="tempPeopleFinderFilter.Rating" Label="Choose level" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" Max="6" />
+            </div>
+        }
+
+        <MudButton Disabled="@_processing" OnClick="@(() => AddFilter())"><span class="secondary-color text-no-transform">Add filter</span></MudButton>
+    </div>
+    <MudStack Class="mt-5" Row="true">
+
+        <MudSpacer />
+        <MudButton OnClick="@(() => Cancel())"><span class="secondary-color text-no-transform">Cancel</span></MudButton>
+        <MudButton Disabled="@(!CanApplyFilters() || _processing)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => ApplyFilters())"><span class="text-no-transform">Filter skills</span></MudButton>
+    </MudStack>
+</div>
+
+@code {
+    [Parameter]
+    public List<PeopleFinderFilter> PeopleFinderFilters { get; set; }
+    private List<PeopleFinderFilter> TempPeopleFinderFilters { get; set; } = new();
+    [Parameter]
+    public IEnumerable<Skill> Skills { get; set; }
+    [Parameter]
+    public IEnumerable<User> Users { get; set; }
+    [Parameter]
+    public List<User> FilteredUsers { get; set; } 
+    [Parameter]
+    public bool IsOpen { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+    private bool _processing = false;
+    private bool _IsFiltersComplete = true;
+
+    private bool CanApplyFilters()
+    {
+        return TempPeopleFinderFilters.All(filter => filter.Skill != null);
+    }
+
+    protected override void OnInitialized()
+    {
+        TempPeopleFinderFilters.AddRange(PeopleFinderFilters);
+        if (TempPeopleFinderFilters.Count == 0)
+        {
+            TempPeopleFinderFilters.Add(new PeopleFinderFilter());
+        }
+    }
+
+    private void AddFilter()
+    {
+        TempPeopleFinderFilters.Add(new PeopleFinderFilter());
+    }
+
+    private void RemoveFilter(PeopleFinderFilter peopleFinderFilter)
+    {
+        TempPeopleFinderFilters.Remove(peopleFinderFilter);
+    }
+
+    private async Task ApplyFilters()
+    {
+        _processing = true;
+        PeopleFinderFilters.Clear();
+        PeopleFinderFilters.AddRange(TempPeopleFinderFilters);
+        FilteredUsers.Clear();
+        FilteredUsers.AddRange(Users);
+
+        var filteredList = FilteredUsers
+       .Where(user => PeopleFinderFilters.All(filter =>
+           user.UserSkillRatings.Any(usr =>
+               usr.Skill.Name == filter.Skill.Name && usr.Rating >= filter.Rating)))
+       .ToList();
+
+        FilteredUsers.Clear();
+        FilteredUsers.AddRange(filteredList);
+        await IsOpenChanged.InvokeAsync();
+        _processing = false;
+    }
+
+    private async Task Cancel()
+    {
+        await IsOpenChanged.InvokeAsync();
+    }
+
+    private async Task<IEnumerable<Skill>> SearchSkill(string value, CancellationToken token)
+    {
+        await Task.CompletedTask;
+        var result = string.IsNullOrEmpty(value) ? Skills :
+        Skills.Where(skill => skill.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        return await Task.FromResult<IEnumerable<Skill>>(result);
+    }
+}

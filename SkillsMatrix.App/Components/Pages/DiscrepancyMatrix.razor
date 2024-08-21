@@ -30,7 +30,7 @@ else
                 }
             </MudChipSet>
             <MudSpacer />
-            <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" />
+           @*  <MudIconButton Class="ml-3" Color="Color.Secondary" Icon="@Icons.Material.Outlined.PersonSearch" OnClick="@(() => ShowFilterMenu(detailedViewBox ? detailedDiscrepancyMatrixGrid: discrepancyMatrixGrid))" /> *@
             <div style="display:inline-block">
                 <MudIconButton Color="Color.Secondary" Icon="@columnFilterIcon" OnClick="@(() => ToggleColumnsMenu())" />
                 <MudPopover Open="@columnsMenuOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
@@ -122,10 +122,10 @@ else
         columnFilterIcon = FilteredSkills.Count() == 0 ? @Icons.Material.Outlined.FilterAlt : @Icons.Material.Filled.FilterAlt;
     }
 
-    private void ShowFilterMenu(MudDataGrid<User> datagrid)
-    {
-        datagrid.ToggleFiltersMenu();
-    }
+    // private void ShowFilterMenu(MudDataGrid<User> datagrid)
+    // {
+    //     datagrid.ToggleFiltersMenu();
+    // }
 
     private void ShowAllSkills()
     {
