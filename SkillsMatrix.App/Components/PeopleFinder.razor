@@ -69,10 +69,8 @@
         _processing = true;
         PeopleFinderFilters.Clear();
         PeopleFinderFilters.AddRange(TempPeopleFinderFilters);
-        FilteredUsers.Clear();
-        FilteredUsers.AddRange(Users);
-
-        var filteredList = FilteredUsers
+        
+        var filteredList = Users
        .Where(user => PeopleFinderFilters.All(filter =>
            user.UserSkillRatings.Any(usr =>
                usr.Skill.Name == filter.Skill.Name && usr.Rating >= filter.Rating)))
