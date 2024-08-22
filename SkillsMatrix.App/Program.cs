@@ -6,18 +6,36 @@ using SkillsMatrix.Infrastructure.Services.SkillService;
 using SkillsMatrix.Infrastructure.Services.UserService;
 using SkillsMatrix.Infrastructure.Services.UserSkillRatingService;
 using SkillsMatrix.Infrastructure.Services.CategoryService;
+using SkillsMatrix.Infrastructure.Services.GraphService;
 using MudBlazor.Services;
 using SkillsMatrix.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+
+
+services
+    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
 // Add services to the container.
 services.AddMemoryCache();
 services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddMicrosoftIdentityConsentHandler();
 services.AddMudServices(x =>
 x.PopoverOptions.ThrowOnDuplicateProvider = false);
+
+
+services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+
+services.Configure<GraphSettings>(builder.Configuration.GetSection(nameof(GraphSettings)));
 services.AddScoped<AppState>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<ISkillService, SkillService>();
@@ -27,6 +45,9 @@ services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 services.AddScoped(typeof(ISkillRepository) , typeof(SkillRepository));
 services.AddScoped(typeof(IUserSkillRatingRepository), typeof(UserSkillRatingRepository));
+services.AddScoped<IGraphUserService, GraphUserService>();
+
+
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
 var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
 services.AddDbContext<SMContext>(options =>
@@ -51,6 +72,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

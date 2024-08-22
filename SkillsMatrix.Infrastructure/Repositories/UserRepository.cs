@@ -11,10 +11,14 @@ namespace SkillsMatrix.Infrastructure.Repositories
             return await _smContext.Users.FirstOrDefaultAsync(user => user.Id == id);
         }
 
-        public new async Task<IEnumerable<User>> GetAll()
+        public new async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _smContext.Users.ToListAsync();
+            return await _smContext.Users.Take(10).ToListAsync();
         }
 
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _smContext.Users;
+        }
     }
 }

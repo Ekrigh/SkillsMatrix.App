@@ -5,6 +5,7 @@ namespace SkillsMatrix.Infrastructure.Models
     public class User
     {
         public int Id { get; set; }
+        public string ActiveDirectoryId { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

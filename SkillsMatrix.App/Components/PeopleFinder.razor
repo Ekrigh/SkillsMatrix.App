@@ -16,7 +16,10 @@
         <MudButton Disabled="@_processing" OnClick="@(() => AddFilter())"><span class="secondary-color text-no-transform">Add filter</span></MudButton>
     </div>
     <MudStack Class="mt-5" Row="true">
-
+        @if(PeopleFinderFilters.Any()) 
+        {
+        <MudButton OnClick="@(() => ClearFilters())"><span class="secondary-color text-no-transform">Reset people finder</span></MudButton>
+        }
         <MudSpacer />
         <MudButton OnClick="@(() => Cancel())"><span class="secondary-color text-no-transform">Cancel</span></MudButton>
         <MudButton Disabled="@(!CanApplyFilters() || _processing)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => ApplyFilters())"><span class="text-no-transform">Filter skills</span></MudButton>
@@ -69,17 +72,25 @@
         _processing = true;
         PeopleFinderFilters.Clear();
         PeopleFinderFilters.AddRange(TempPeopleFinderFilters);
-        
+
         var filteredList = Users
        .Where(user => PeopleFinderFilters.All(filter =>
            user.UserSkillRatings.Any(usr =>
-               usr.Skill.Name == filter.Skill.Name && usr.Rating >= filter.Rating)))
+               usr.Skill == filter.Skill && usr.Rating >= filter.Rating)))
        .ToList();
 
         FilteredUsers.Clear();
         FilteredUsers.AddRange(filteredList);
         await IsOpenChanged.InvokeAsync();
         _processing = false;
+    }
+
+    private async Task ClearFilters()
+    {
+        PeopleFinderFilters.Clear();
+        FilteredUsers.Clear();
+        FilteredUsers.AddRange(Users);
+        await IsOpenChanged.InvokeAsync();
     }
 
     private async Task Cancel()

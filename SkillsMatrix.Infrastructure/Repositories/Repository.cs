@@ -10,7 +10,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
         {
             return await _smContext.Set<T>().FindAsync(id);
         }
-
+        
         public async Task<IEnumerable<T>> GetAll()
         {
             return await _smContext.Set<T>().ToListAsync();
@@ -19,6 +19,12 @@ namespace SkillsMatrix.Infrastructure.Repositories
         public async Task Add(T entity)
         {
             await _smContext.Set<T>().AddAsync(entity);
+            await _smContext.SaveChangesAsync();
+        }
+
+        public async Task AddAll(IEnumerable<T> entities)
+        {
+            await _smContext.Set<T>().AddRangeAsync(entities);
             await _smContext.SaveChangesAsync();
         }
 

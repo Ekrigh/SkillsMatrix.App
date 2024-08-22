@@ -3,6 +3,9 @@
 @inject ISkillService skillService
 @inject ICategoryService categoryService
 @inject IUserSkillRatingService userSkillRatingService
+@inject IGraphUserService graphService
+
+
 <MudOverlay @bind-Visible="columnsMenuOpen" AutoClose="true" />
 <MudOverlay @bind-Visible="peopleFinderOpen" AutoClose="true" />
 @if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
@@ -11,6 +14,8 @@
 }
 else
 {
+    <MudButton OnClick="@(async () => await graphService.MapUsers())">Import Users</MudButton>
+
     <div class="m-5">
         <h4 class="ml-1">Skillsmatrix</h4>
         <div Class="d-flex">

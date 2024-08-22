@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,8 +17,33 @@
     <HeadOutlet />
 </head>
 <body>
-    <Routes />
+    <CascadingAuthenticationState>
+        <Routes />
+    </CascadingAuthenticationState>
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 </html>
+
+
+@code {
+    [Inject] private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SetPermissions();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SetPermissions()
+    {
+        var authenticationState = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+
+        if (authenticationState != null)
+        {
+            var userId = authenticationState.GetUserId();
+            //var rechten = await GraphSecurityAttributesService.GetCustomSecurityAttributes(gebruikerId);
+        }
+
+    }
+}

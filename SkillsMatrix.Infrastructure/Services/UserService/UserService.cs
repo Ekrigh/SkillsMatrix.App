@@ -20,15 +20,16 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
             }
         }
 
-        public async Task<IEnumerable<User>> GetAll()
-        {
-            return await _userRepository.GetAll();
-        }
-
         public async Task Add(User user)
         {
             await _userRepository.Add(user);
         }
+
+        public async Task AddAll(List<User> users)
+        {
+            await _userRepository.AddAll(users);
+        }
+
         public async Task Delete(User user)
         {
             await _userRepository.Remove(user);
@@ -42,6 +43,16 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
         public async Task UpdateAll(IEnumerable<User> users)
         {
             await _userRepository.UpdateAll(users);
+        }
+
+        public async Task<IEnumerable<User>> GetAll()
+        {
+            return await _userRepository.GetAllUsersAsync();
+        }
+
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _userRepository.GetAllUsers();
         }
     }
 }
