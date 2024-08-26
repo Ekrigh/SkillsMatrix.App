@@ -12,7 +12,7 @@
     }
 </style>
 
-@if ((Users == null || !Users.Any()) || (Skills == null || !Skills.Any()))
+@if (Users == null || Skills == null || Categories == null)
 {
     <p>Loading...</p>
 }
@@ -46,11 +46,11 @@ else
         }
         @if (detailedViewBox)
         {
-            <DetailedDiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => detailedDiscrepancyMatrixGrid = grid" />
+            <DetailedDiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" GetRating="@GetRating" GetDesiredRating="@GetDesiredRating" GetDiscrepancy="@GetDiscrepancy" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => detailedDiscrepancyMatrixGrid = grid" />
         }
         else
         {
-            <DiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => discrepancyMatrixGrid = grid" />
+            <DiscrepancyMatrixView Users="@Users" Skills="@SkillsToRender" _selectedCategories="@_selectedCategories" _ratingCellStyleFunc="@_ratingCellStyleFunc" GetRating="@GetRating" GetDesiredRating="@GetDesiredRating" GetDiscrepancy="@GetDiscrepancy" _discrepancyAggregation="@_discrepancyAggregation" _quickFilter="@_quickFilter" OnGridReferenceSet="(grid) => discrepancyMatrixGrid = grid" />
         }
     </div>
 }
@@ -62,6 +62,9 @@ else
     private IEnumerable<Category> Categories { get; set; }
     private IReadOnlyCollection<Category> _selectedCategories = new List<Category>();
     private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
+    private Dictionary<(int, int), int> _ratingCache;
+    private Dictionary<(int, int), int> _desiredRatingCache;
+    private Dictionary<(int, int), int> _discrepancyCache;
     private MudDataGrid<User> detailedDiscrepancyMatrixGrid;
     private MudDataGrid<User> discrepancyMatrixGrid;
     private string _searchString;
@@ -85,14 +88,30 @@ else
         Skills = await skillService.GetAll();
         Categories = await categoryService.GetAll();
         UserSkillRatings = await userSkillRatingService.GetAll();
+
+        _ratingCache = UserSkillRatings.ToDictionary(
+       usr => (usr.UserId, usr.SkillId),
+       usr => usr.Rating 
+       );
+
+        _desiredRatingCache = UserSkillRatings.ToDictionary(
+       usr => (usr.UserId, usr.SkillId),
+       usr => usr.DesiredRating
+       );
+
+        _discrepancyCache = UserSkillRatings.ToDictionary(
+       usr => (usr.UserId, usr.SkillId),
+       usr =>  usr.Rating - usr.DesiredRating
+       );
     }
 
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
-        string style = "font-weight:bold;text-align:center";
-        int? ratingDiff = userSkillRatingService.GetDiscrepancy(user, skill);
 
-        switch (ratingDiff)
+        int? discrepancy = GetDiscrepancy(user.Id, skill.Id);
+        string style = "font-weight:bold;text-align:center";
+
+        switch (discrepancy)
         {
             case -5:
                 style += ";background-color:#E94B41CC";
@@ -130,6 +149,21 @@ else
     private void ShowAllSkills()
     {
         _selectedCategories = new List<Category>();
+    }
+
+    private int GetDiscrepancy(int userId, int skillId)
+    {
+        return _discrepancyCache.TryGetValue((userId, skillId), out var discrepancy) ? discrepancy : 0;
+    }
+
+    private int GetDesiredRating(int userId, int skillId)
+    {
+        return _desiredRatingCache.TryGetValue((userId, skillId), out var desiredRating) ? desiredRating : 0;
+    }
+
+    private int GetRating(int userId, int skillId)
+    {
+        return _ratingCache.TryGetValue((userId, skillId), out var rating) ? rating : 0;
     }
 }
 

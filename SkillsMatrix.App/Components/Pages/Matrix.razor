@@ -4,10 +4,9 @@
 @inject ICategoryService categoryService
 @inject IUserSkillRatingService userSkillRatingService
 
-
 <MudOverlay @bind-Visible="columnsMenuOpen" AutoClose="true" />
 <MudOverlay @bind-Visible="peopleFinderOpen" AutoClose="true" />
-@if (Users == null ||  Skills == null)
+@if (Users == null ||  Skills == null || Categories == null)
 {
     <p>Loading...</p>
 }
@@ -40,10 +39,10 @@ else
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 
-        <MudDataGrid @ref="matrixGrid" Virtualize="true" OverscanCount="0" FixedHeader="true" FixedFooter="true" Height="800px" Class="mt-5 rounded-lg" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@FilteredUsers" QuickFilter="_quickFilter"
+        <MudDataGrid @ref="matrixGrid" Virtualize="true" FixedHeader="true" FixedFooter="true" Height="800px" Class="mt-5 rounded-lg" Style="box-shadow: 0px 3px 6px 0px #20202029;" T="User" Items="@FilteredUsers" QuickFilter="_quickFilter"
                      Bordered="true" Striped="true" ShowFilterIcons="false" ShowColumnOptions="false" HorizontalScrollbar="true">
             <Columns>
-                <PropertyColumn CellClass="sticky-column" HeaderClass="sticky-column" Property="User => User.Name" Title="User">
+                <PropertyColumn Property="User => User.Name" Title="User">
                     <HeaderTemplate>
                         <MudText><strong>User</strong></MudText>
                     </HeaderTemplate>
@@ -54,7 +53,7 @@ else
                 @foreach (var skill in SkillsToRender.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
                 {
 
-                    <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id)" Class="mw-100" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
+                <PropertyColumn Property="user => GetRating(user.Id, skill.Id)" Class="mw-100" Title="@skill.Name" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_ratingAggregation">
                         <HeaderTemplate>
                             <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                                 <MudText><strong>@skill.Name</strong></MudText>
@@ -63,6 +62,9 @@ else
                     </PropertyColumn>
                 }
             </Columns>
+           @*  <PagerContent>
+                <MudDataGridPager T="User" />
+            </PagerContent> *@
         </MudDataGrid>
     </div>
 }
@@ -75,7 +77,7 @@ else
     private List<Skill> FilteredSkills { get; set; } = new();
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<UserSkillRating> UserSkillRatings { get; set; } = new List<UserSkillRating>();
-    // private Dictionary<(int, int), int> _ratingCache;
+    private Dictionary<(int, int), int> _ratingCache;
     private MudDataGrid<User> matrixGrid;
     private string _searchString;
     private IReadOnlyCollection<Category> _selectedCategories = new List<Category>();
@@ -103,17 +105,16 @@ else
         UserSkillRatings = await userSkillRatingService.GetAll();
         FilteredUsers = Users.ToList();
 
-        // _ratingCache = UserSkillRatings.ToDictionary(
-        // usr => (usr.UserId, usr.SkillId),
-        // usr => usr.Rating
-        //);
+        _ratingCache = UserSkillRatings.ToDictionary(
+        usr => (usr.UserId, usr.SkillId),
+        usr => usr.Rating
+        );
     }
 
     private Func<User, Skill, string> _ratingCellStyleFunc => (user, skill) =>
     {
         string style = "font-weight:bold; text-align:center";
-        // int? rating = _ratingCache.TryGetValue((user.Id, skill.Id), out var r) ? r : null;
-        int? rating = userSkillRatingService.GetRating(user.Id, skill.Id);
+        int? rating = GetRating(user.Id, skill.Id);
 
         switch (rating)
         {
@@ -164,6 +165,10 @@ else
         _selectedCategories = new List<Category>();
     }
 
+    private int GetRating(int userId, int skillId)
+    {
+        return _ratingCache.TryGetValue((userId, skillId), out var rating) ? rating : 0;
+    }
 }
 
 

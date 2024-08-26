@@ -1,7 +1,7 @@
 ﻿@using MudBlazor
 @inject IUserSkillRatingService userSkillRatingService
 
-<MudDataGrid Class="mt-5 rounded-lg custom-grid" Virtualize="true" OverscanCount="0" FixedHeader="true" FixedFooter="true" Height="800px" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users"
+<MudDataGrid Class="mt-5 rounded-lg custom-grid" Virtualize="true" FixedHeader="true" FixedFooter="true" Height="800px" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users"
           Bordered="true" Striped="true" HorizontalScrollbar="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
     <Columns>
         <PropertyColumn Property="User => User.Name" Title="User">
@@ -13,7 +13,7 @@
         @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
         {
             var titleString = $"{skill.Name} Rating";
-            <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+            <PropertyColumn Property="user => GetRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
                 <HeaderTemplate>
                     <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                         <MudText><b>@skill.Name</b></MudText>
@@ -21,17 +21,17 @@
                 </HeaderTemplate>
                 <CellTemplate>
                     <MudTooltip Text="rating" Arrow="true" Placement="Placement.Top">
-                        <MudText><strong>@userSkillRatingService.GetRating(context.Item.Id, skill.Id)</strong></MudText>
+                        <MudText><strong>@GetRating(context.Item.Id, skill.Id)</strong></MudText>
                     </MudTooltip>
                 </CellTemplate>
             </PropertyColumn>
 
             titleString = $"{skill.Name} Desired Rating";
-            <PropertyColumn Property="user => userSkillRatingService.GetDesiredRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+            <PropertyColumn Property="user => GetDesiredRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
                 <HeaderTemplate />
                 <CellTemplate>
                     @{
-                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id);
+                        var desiredRating = GetDesiredRating(context.Item.Id, skill.Id);
                     }
                     <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
                         <MudText><strong>@desiredRating</strong></MudText>
@@ -40,11 +40,11 @@
             </PropertyColumn>
 
             titleString = $"{skill.Name} Discrepancy";
-            <PropertyColumn Property="user => userSkillRatingService.GetDiscrepancy(user, skill)" Title="@titleString" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
+            <PropertyColumn Property="user => GetDiscrepancy(user.Id, skill.Id)" Title="@titleString" FooterStyle="text-align:center" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" AggregateDefinition="_discrepancyAggregation" Sortable="true" CellStyle="border-right: 2px solid black;">
                 <HeaderTemplate />
                 <CellTemplate>
                     <MudTooltip Text="Discrepancy" Arrow="true" Placement="Placement.Top">
-                        <MudText><strong>@userSkillRatingService.GetDiscrepancy(context.Item, skill)</strong></MudText>
+                        <MudText><strong>@GetDiscrepancy(context.Item.Id, skill.Id)</strong></MudText>
                     </MudTooltip>
                 </CellTemplate>
             </PropertyColumn>
@@ -57,6 +57,10 @@
     [Parameter] public IEnumerable<Skill> Skills { get; set; }
     [Parameter] public IReadOnlyCollection<Category> _selectedCategories { get; set; }
     [Parameter] public Func<User, Skill, string> _ratingCellStyleFunc { get; set; }
+    [Parameter] public Func<int, int, int> GetRating { get; set; }
+    [Parameter] public Func<int, int, int> GetDesiredRating { get; set; }
+    [Parameter] public Func<int, int, int> GetDiscrepancy { get; set; }
+    [Parameter] public Func<User, bool> _quickFilter { get; set; }
     [Parameter] public AggregateDefinition<User> _discrepancyAggregation { get; set; }
     [Parameter] public Func<User, bool> _quickFilter { get; set; }
     [Parameter] public EventCallback<MudDataGrid<User>> OnGridReferenceSet { get; set; }

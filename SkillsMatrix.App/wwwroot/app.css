@@ -140,10 +140,4 @@ h1:focus {
         content: '6';
     }
 
-.sticky-column {
-    left: 0px;
-    position: sticky;
-    background-color: var(--mud-palette-background-gray);
-    z-index: 1
-}
 

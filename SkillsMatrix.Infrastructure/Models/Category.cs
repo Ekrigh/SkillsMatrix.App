@@ -10,6 +10,6 @@ namespace SkillsMatrix.Infrastructure.Models
         public string? Description { get; set; }
         public int? ParentCategoryId { get; set; }
         public Category ParentCategory { get; set; }
-        public virtual List<Category> SubCategories { get; set; } = new();
+        public List<Category> SubCategories { get; set; } = new();
     }
 }

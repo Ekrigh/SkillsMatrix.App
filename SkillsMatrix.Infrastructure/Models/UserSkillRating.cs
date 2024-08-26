@@ -9,7 +9,7 @@ namespace SkillsMatrix.Infrastructure.Models
         public DateTime LastUpdated { get; set; }
         public int UserId { get; set; }
         public int SkillId { get; set; }
-        public virtual User User { get; set; } 
-        public virtual Skill Skill { get; set; } 
+        public User User { get; set; } 
+        public Skill Skill { get; set; } 
     }
 }

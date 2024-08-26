@@ -11,7 +11,7 @@ namespace SkillsMatrix.Infrastructure.Models
         [Required]
         public string Email { get; set; }
         public DateTime LastSurvey { get; set; }
-        public virtual List<Skill> Skills { get; set; } = new();
-        public virtual List<UserSkillRating> UserSkillRatings { get; set; } = new();
+        public List<Skill> Skills { get; set; } = new();
+        public List<UserSkillRating> UserSkillRatings { get; set; } = new();
     }
 }
