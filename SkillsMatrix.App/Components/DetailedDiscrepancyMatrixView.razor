@@ -62,7 +62,6 @@
     [Parameter] public Func<int, int, int> GetDiscrepancy { get; set; }
     [Parameter] public Func<User, bool> _quickFilter { get; set; }
     [Parameter] public AggregateDefinition<User> _discrepancyAggregation { get; set; }
-    [Parameter] public Func<User, bool> _quickFilter { get; set; }
     [Parameter] public EventCallback<MudDataGrid<User>> OnGridReferenceSet { get; set; }
 
     public MudDataGrid<User> GridReference { get; private set; }
