@@ -10,8 +10,8 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
         Task<IEnumerable<UserSkillRating>> GetAll();
         Task Add(UserSkillRating userSkillRating);
         Task AddAll(List<UserSkillRating> userSkillRatings);
-        Task<int> GetRating(int userId, int skillId);
-        Task<int> GetDesiredRating(int userId, int skillId);
+        int GetRating(int userId, int skillId);
+        int GetDesiredRating(int userId, int skillId);
         int GetDiscrepancy(User user, Skill skill);
     }
 }

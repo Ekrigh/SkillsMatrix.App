@@ -7,6 +7,7 @@ namespace SkillsMatrix.Infrastructure.Repositories
     {
         IEnumerable<User> GetAllUsers();
         Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<User> GetByAdId(Guid adId);
         Task<User> GetById(int id);
     }
 }

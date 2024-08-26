@@ -5,7 +5,7 @@
 @inject ISkillService skillService
 @inject ISnackbar Snackbar
 
-@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatingsByUser == null || !UserSkillRatingsByUser.Any()))
+@if (currentUser == null || (Skills == null || !Skills.Any()) || (Categories == null || !Categories.Any()) || (UserSkillRatingsByUser == null))
 {
     <p>Loading...</p>
 }
@@ -17,7 +17,6 @@ else
                 @category.Name
             </StepTemplate>
             <ContentTemplate>
-
                 <div class="rating-grid">
                     @foreach (var skill in Skills.Where(s => s.CategoryId == category.Id))
                     {
@@ -46,6 +45,7 @@ else
 }
 
 @code {
+    [Inject] private AuthenticationStateProvider GetAuthenticationStateAsync { get; set; }
     private User currentUser;
     private IEnumerable<Category> Categories { get; set; }
     private IEnumerable<Skill> Skills { get; set; }
@@ -55,11 +55,23 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await userService.GetById(12);
+        await SetPermissions();
         Categories = await categoryService.GetAll();
         UserSkillRatingsByUser = await userSkillRatingService.GetAllByUserId(currentUser.Id);
         Skills = await skillService.GetAll();
         TempUserRatings = CreateDeepCopy(UserSkillRatingsByUser.Where(usr => Skills.Any(skill => skill.Id == usr.SkillId)).ToList());
+    }
+
+    private async Task SetPermissions()
+    {
+        var authenticationState = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+
+        if (authenticationState != null)
+        {
+            var userId = authenticationState.GetUserId();
+            currentUser = await userService.GetByAdId(userId);
+            //var rechten = await GraphSecurityAttributesService.GetCustomSecurityAttributes(gebruikerId);
+        }
     }
 
     private async Task HandleValidSubmit()

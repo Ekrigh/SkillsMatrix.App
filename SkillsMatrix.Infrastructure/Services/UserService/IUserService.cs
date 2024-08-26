@@ -11,6 +11,6 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
         Task Delete(User user);
         Task Update(User user);
         Task UpdateAll(IEnumerable<User> users);
-
+        Task<User> GetByAdId(Guid adId);
     }
 }

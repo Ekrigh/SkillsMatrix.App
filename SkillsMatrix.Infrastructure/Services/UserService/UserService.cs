@@ -20,6 +20,18 @@ namespace SkillsMatrix.Infrastructure.Services.UserService
             }
         }
 
+        public async Task<User> GetByAdId(Guid adId)
+        {
+            try
+            {
+                return await _userRepository.GetByAdId(adId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task Add(User user)
         {
             await _userRepository.Add(user);

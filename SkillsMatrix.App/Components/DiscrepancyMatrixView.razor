@@ -1,9 +1,9 @@
 ﻿@inject IUserSkillRatingService userSkillRatingService
 
-<MudDataGrid Class="mt-5 rounded-lg custom-grid" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users" FilterMode="DataGridFilterMode.Simple"
-             Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+<MudDataGrid Class="mt-5 rounded-lg custom-grid" Virtualize="true" OverscanCount="0" FixedHeader="true" FixedFooter="true" Height="800px" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users"
+             Bordered="true" Striped="true" HorizontalScrollbar="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
     <Columns>
-        <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+        <PropertyColumn Property="User => User.Name" Title="User">
             <HeaderTemplate>
                 <MudText><strong>User</strong></MudText>
             </HeaderTemplate>
@@ -23,8 +23,8 @@
                 </HeaderTemplate>
                 <CellTemplate>
                     @{
-                        var rating = userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result;
-                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
+                        var rating = userSkillRatingService.GetRating(context.Item.Id, skill.Id);
+                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id);
                         var discrepancy = userSkillRatingService.GetDiscrepancy(context.Item, skill);
                         string tooltip = $"Rating: {rating}, Desired: {desiredRating}";
                     }

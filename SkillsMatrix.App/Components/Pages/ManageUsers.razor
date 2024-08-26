@@ -1,6 +1,7 @@
 ﻿@page "/manageusers"
 @inject IUserService userService
 @inject ISnackbar Snackbar
+@inject IGraphUserService graphService
 
 <PageTitle>Manage User</PageTitle>
 
@@ -23,6 +24,7 @@
             <MudText Color="Color.Error">@ErrorMessage</MudText>
         }
     </EditForm>
+    <MudButton OnClick="@(async () => await graphService.MapUsers())">Import Users</MudButton>
 </div>
 
 @code

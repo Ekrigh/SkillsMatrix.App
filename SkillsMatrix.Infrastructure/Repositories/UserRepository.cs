@@ -13,12 +13,17 @@ namespace SkillsMatrix.Infrastructure.Repositories
 
         public new async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return await _smContext.Users.Take(10).ToListAsync();
+            return await _smContext.Users.ToListAsync();
         }
 
         public IEnumerable<User> GetAllUsers()
         {
             return _smContext.Users;
+        }
+
+        public async Task<User> GetByAdId(Guid adId)
+        {
+            return await _smContext.Users.FirstOrDefaultAsync(user => user.ActiveDirectoryId == adId.ToString());
         }
     }
 }

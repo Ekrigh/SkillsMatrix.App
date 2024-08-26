@@ -50,13 +50,13 @@ namespace SkillsMatrix.Infrastructure.Services.UserSkillRatingService
             await _userSkillRatingRepository.AddAll(userSkillRatings);
         }
 
-        public async Task<int> GetRating(int userId, int skillId)
+        public int GetRating(int userId, int skillId)
         {
             var userSkillRating = _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
             return userSkillRating?.Rating ?? 0;
         }
 
-        public async Task<int> GetDesiredRating(int userId, int skillId)
+        public int GetDesiredRating(int userId, int skillId)
         {
             var userSkillRating = _userSkillRatingRepository.GetByUserIdAndSkillId(userId, skillId);
             return userSkillRating?.DesiredRating ?? 0;

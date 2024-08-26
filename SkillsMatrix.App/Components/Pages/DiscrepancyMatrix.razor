@@ -37,7 +37,7 @@ else
                     <ColumnsMenu IsOpen="@columnsMenuOpen" IsOpenChanged="ToggleColumnsMenu" Skills="@Skills" Categories="@Categories" SelectedCategories="@_selectedCategories.ToList()" FilteredSkills="FilteredSkills" />
                 </MudPopover>
             </div>
-            <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start" Immediate="true"
+            <MudInput Class="ml-1" Style="width:320px" Margin="Margin.Dense" @bind-Value="_searchString" Placeholder="Search user" Variant="Variant.Outlined" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudInput>
         </div>
 

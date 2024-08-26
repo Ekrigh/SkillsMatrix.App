@@ -1,10 +1,10 @@
 ﻿@using MudBlazor
 @inject IUserSkillRatingService userSkillRatingService
 
-<MudDataGrid Class="mt-5 rounded-lg custom-grid" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users" FilterMode="DataGridFilterMode.Simple"
-             Filterable="true" Hover="true" Bordered="true" Striped="true" HorizontalScrollbar="true" Hideable="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
+<MudDataGrid Class="mt-5 rounded-lg custom-grid" Virtualize="true" OverscanCount="0" FixedHeader="true" FixedFooter="true" Height="800px" Style="box-shadow: 0px 3px 6px 0px #20202029;" @ref="GridReference" T="User" Items="@Users"
+          Bordered="true" Striped="true" HorizontalScrollbar="true" ShowFilterIcons="false" ShowColumnOptions="false" QuickFilter="@_quickFilter">
     <Columns>
-        <PropertyColumn Property="User => User.Name" Title="User" StickyLeft="true" Hideable="false">
+        <PropertyColumn Property="User => User.Name" Title="User">
             <FooterTemplate>
                 <MudText><strong>Total:</strong></MudText>
             </FooterTemplate>
@@ -13,7 +13,7 @@
         @foreach (var skill in Skills.Where(s => _selectedCategories.Contains(s.Category) || _selectedCategories.Count == 0))
         {
             var titleString = $"{skill.Name} Rating";
-            <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false" Groupable="true">
+            <PropertyColumn Property="user => userSkillRatingService.GetRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
                 <HeaderTemplate>
                     <MudTooltip Text="@skill.Description" Arrow="true" Placement="Placement.Top">
                         <MudText><b>@skill.Name</b></MudText>
@@ -21,17 +21,17 @@
                 </HeaderTemplate>
                 <CellTemplate>
                     <MudTooltip Text="rating" Arrow="true" Placement="Placement.Top">
-                        <MudText><strong>@userSkillRatingService.GetRating(context.Item.Id, skill.Id).Result</strong></MudText>
+                        <MudText><strong>@userSkillRatingService.GetRating(context.Item.Id, skill.Id)</strong></MudText>
                     </MudTooltip>
                 </CellTemplate>
             </PropertyColumn>
 
             titleString = $"{skill.Name} Desired Rating";
-            <PropertyColumn Property="user => userSkillRatingService.GetDesiredRating(user.Id, skill.Id).Result" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
+            <PropertyColumn Property="user => userSkillRatingService.GetDesiredRating(user.Id, skill.Id)" Title="@titleString" CellStyleFunc="@(user => _ratingCellStyleFunc(user, skill))" Sortable="false">
                 <HeaderTemplate />
                 <CellTemplate>
                     @{
-                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id).Result;
+                        var desiredRating = userSkillRatingService.GetDesiredRating(context.Item.Id, skill.Id);
                     }
                     <MudTooltip Text="Desired rating" Arrow="true" Placement="Placement.Top">
                         <MudText><strong>@desiredRating</strong></MudText>

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SkillsMatrix.App;
 using SkillsMatrix.App.Components;
 using SkillsMatrix.Infrastructure;
 using SkillsMatrix.Infrastructure.Repositories;
@@ -8,9 +9,10 @@ using SkillsMatrix.Infrastructure.Services.UserSkillRatingService;
 using SkillsMatrix.Infrastructure.Services.CategoryService;
 using SkillsMatrix.Infrastructure.Services.GraphService;
 using MudBlazor.Services;
-using SkillsMatrix.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
